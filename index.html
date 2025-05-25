@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> {/* Added user-scalable=no */}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Eleanor's Animal Adventure!</title>
     <style>
         html, body {
@@ -13,7 +13,8 @@
             overflow: hidden;
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif;
             background-color: #87CEEB;
-            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation; /* Prevent double-tap zoom, etc. */
         }
         body {
             display: flex;
@@ -27,10 +28,10 @@
             flex-shrink: 0;
             box-sizing: border-box;
         }
-        header h1 { margin: 0; font-size: 1.2em; /* Slightly smaller for mobile */ text-shadow: 1px 1px 1px #c88a97; }
-        #score-board { font-size: 0.9em; /* Smaller */ margin-top: 2px; font-weight: bold; }
+        header h1 { margin: 0; font-size: 1.1em; /* Mobile friendly */ text-shadow: 1px 1px 1px #c88a97; }
+        #score-board { font-size: 0.85em; margin-top: 2px; font-weight: bold; }
         #toggle-button {
-            padding: 6px 12px; /* Adjusted */ font-size: 0.85em; /* Adjusted */ margin-top: 3px; margin-bottom: 3px;
+            padding: 5px 10px; font-size: 0.8em; margin-top: 2px; margin-bottom: 2px;
             cursor: pointer; background-color: #F0F0F0; border: 1px solid #D0D0D0;
             border-radius: 4px; font-family: inherit;
         }
@@ -42,39 +43,37 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative; /* For positioning D-pad within main if needed, or play-area */
+            position: relative;
         }
         #play-area {
             width: 100%;
             height: 100%;
             background-color: #90EE90;
             border: 2px solid #6B8E23;
-            position: relative; /* For positioning elements inside, and D-pad relative to it */
+            position: relative;
             overflow: hidden;
             box-sizing: border-box;
         }
         .animal, .food {
             position: absolute; display: none;
             will-change: transform, left, top;
-            transition: opacity 0.2s ease-in-out;
+            transition: opacity 0.1s ease-in-out; /* Faster transition */
         }
-        /* Animal and Food SVGs (sizes can be adjusted for smaller screens if needed, or use vw/vh units) */
-        #rabbit { width: clamp(60px, 10vw, 80px); height: auto; aspect-ratio: 100 / 120; z-index: 5; animation: subtleHop 2s infinite ease-in-out; --animal-scaleX: 1; }
-        #giraffe { width: clamp(50px, 9vw, 70px); height: auto; aspect-ratio: 100 / 180; z-index: 5; animation: subtleSway 3s infinite ease-in-out; --animal-scaleX: 1; }
-        #carrot { width: clamp(25px, 5vw, 35px); height: auto; aspect-ratio: 40 / 70; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
-        #lettuce { width: clamp(30px, 6vw, 45px); height: auto; aspect-ratio: 60 / 50; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
-
+        #rabbit { width: clamp(55px, 9vw, 80px); height: auto; aspect-ratio: 100 / 120; z-index: 5; animation: subtleHop 2s infinite ease-in-out; --animal-scaleX: 1; }
+        #giraffe { width: clamp(45px, 8vw, 70px); height: auto; aspect-ratio: 100 / 180; z-index: 5; animation: subtleSway 3s infinite ease-in-out; --animal-scaleX: 1; }
+        #carrot { width: clamp(22px, 4.5vw, 35px); height: auto; aspect-ratio: 40 / 70; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
+        #lettuce { width: clamp(28px, 5.5vw, 45px); height: auto; aspect-ratio: 60 / 50; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
 
         body:not(.giraffe-mode) #rabbit, body:not(.giraffe-mode) #carrot { display: block; }
         body.giraffe-mode #giraffe, body.giraffe-mode #lettuce { display: block; }
 
-        @keyframes subtleHop { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(-3px); /* Smaller hop */ } }
+        @keyframes subtleHop { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(-3px); } }
         @keyframes subtleSway { 0%, 100% { transform: scaleX(var(--animal-scaleX)) rotate(0deg); } 50% { transform: scaleX(var(--animal-scaleX)) rotate(1.5deg); } 75% { transform: scaleX(var(--animal-scaleX)) rotate(-1.5deg); } }
 
         #celebration-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 20; }
         .firework-particle, .flag-particle { position: absolute; will-change: transform, opacity; }
-        .firework-particle { width: 6px; height: 6px; /* Smaller particles */ border-radius: 50%; animation: explodeAnim 0.8s ease-out forwards; }
-        .flag-particle { width: 15px; height: 22px; /* Smaller flags */ animation: flagWaveAnim 1.2s ease-out forwards; }
+        .firework-particle { width: 6px; height: 6px; border-radius: 50%; animation: explodeAnim 0.8s ease-out forwards; }
+        .flag-particle { width: 15px; height: 22px; animation: flagWaveAnim 1.2s ease-out forwards; }
         .flag-particle svg { width: 100%; height: 100%; display: block; }
 
         @keyframes explodeAnim { 0% { transform: translate(var(--particle-start-x, -50%), var(--particle-start-y, -50%)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--particle-end-x), var(--particle-end-y)) scale(0.3) rotate(var(--particle-end-rotate, 0deg)); opacity: 0; } }
@@ -82,44 +81,41 @@
 
         footer {
             background-color: #FFB6C1; color: white; text-align: center;
-            padding: 2px 0; /* Reduced padding */ width: 100%;
-            font-size: 0.7em; /* Smaller font */ flex-shrink: 0;
+            padding: 2px 0; width: 100%;
+            font-size: 0.65em; flex-shrink: 0;
             box-sizing: border-box; z-index: 100;
         }
 
-        /* --- On-Screen Controls --- */
         #d-pad-container {
-            position: fixed; /* Fixed position on viewport */
-            bottom: 20px;
-            left: 20px;
-            width: 120px; /* D-pad container size */
-            height: 120px;
+            position: fixed;
+            bottom: clamp(10px, 3vh, 20px); /* Responsive bottom */
+            left: clamp(10px, 3vw, 20px);   /* Responsive left */
+            width: clamp(100px, 25vmin, 130px); /* Responsive size, vmin for smallest dimension */
+            height: clamp(100px, 25vmin, 130px);
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: 1fr 1fr 1fr;
             gap: 2px;
-            z-index: 200; /* Above game, below modals if any */
-            opacity: 0.7; /* Slightly transparent */
+            z-index: 200;
+            opacity: 0.65; /* Slightly more transparent */
         }
         .d-pad-button {
-            background-color: rgba(100, 100, 100, 0.7);
-            border: 1px solid rgba(200, 200, 200, 0.8);
+            background-color: rgba(80, 80, 80, 0.7); /* Darker base */
+            border: 1px solid rgba(180, 180, 180, 0.8);
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5em;
+            font-size: clamp(1.2em, 4vmin, 1.8em); /* Responsive font size */
             color: white;
-            user-select: none; /* Prevent text selection */
-            cursor: pointer; /* For mouse interaction on desktop */
+            user-select: none;
+            cursor: pointer;
         }
-        .d-pad-button:active { /* Feedback on touch/click */
-            background-color: rgba(150, 150, 150, 0.9);
+        .d-pad-button:active {
+            background-color: rgba(120, 120, 120, 0.9); /* Darker active */
         }
         #d-pad-up    { grid-column: 2; grid-row: 1; }
         #d-pad-left  { grid-column: 1; grid-row: 2; }
-        /* Center button (can be empty or another action) */
-        /* #d-pad-center { grid-column: 2; grid-row: 2; background: transparent; border: none;} */
         #d-pad-right { grid-column: 3; grid-row: 2; }
         #d-pad-down  { grid-column: 2; grid-row: 3; }
 
@@ -140,12 +136,11 @@
             <div id="celebration-container"></div>
         </div>
     </main>
-    <footer> <p>Use ARROW KEYS, GAMEPAD, or ON-SCREEN controls!</p> </footer>
+    <footer> <p>Eleanor's Animal Adventure!</p> </footer>
 
     <div id="d-pad-container">
         <div class="d-pad-button" id="d-pad-up">▲</div>
         <div class="d-pad-button" id="d-pad-left">◄</div>
-        <!-- <div class="d-pad-button" id="d-pad-center"></div> -->
         <div class="d-pad-button" id="d-pad-right">►</div>
         <div class="d-pad-button" id="d-pad-down">▼</div>
     </div>
@@ -161,15 +156,13 @@
             const celebrationContainer = document.getElementById('celebration-container');
             const scoreDisplay = document.getElementById('score-display');
             const foodNameSpan = document.getElementById('food-name');
-            const footerFoodNameSpan = document.getElementById('footer-food-name');
+            // const footerFoodNameSpan = document.getElementById('footer-food-name'); // Removed as footer text is simpler now
             const toggleButton = document.getElementById('toggle-button');
 
-            // D-pad buttons
             const dPadUp = document.getElementById('d-pad-up');
             const dPadDown = document.getElementById('d-pad-down');
             const dPadLeft = document.getElementById('d-pad-left');
             const dPadRight = document.getElementById('d-pad-right');
-
 
             let score = 0;
             let isGiraffeMode = false;
@@ -177,84 +170,110 @@
             let activeFood = carrotEl;
             let A_WIDTH, A_HEIGHT, F_WIDTH, F_HEIGHT;
 
-            let moveSpeed = 6; // Adjusted for touch, can fine-tune
+            let moveSpeed = 5; // Adjusted for potentially smaller screen and clamp sizes
             let animalX, animalY;
             let animalScaleX = 1;
 
             const keysPressed = {};
             let gamepadIndex = null;
-            const JOYSTICK_DEADZONE = 0.2;
+            const JOYSTICK_DEADZONE = 0.25; // Slightly higher for less sensitive joysticks
+
+            function updateActiveAnimalDimensions() {
+                A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width);
+                A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);
+            }
+            function updateActiveFoodDimensions() {
+                F_WIDTH = parseFloat(getComputedStyle(activeFood).width);
+                F_HEIGHT = parseFloat(getComputedStyle(activeFood).height);
+            }
 
             function updateActiveElements() {
                 isGiraffeMode = body.classList.contains('giraffe-mode');
+                const oldAnimal = activeAnimal;
+
                 if (isGiraffeMode) {
                     activeAnimal = giraffeEl; activeFood = lettuceEl;
-                    foodNameSpan.textContent = "Lettuce"; footerFoodNameSpan.textContent = "lettuce";
+                    foodNameSpan.textContent = "Lettuce";
                     toggleButton.textContent = "Change to Rabbit";
                 } else {
                     activeAnimal = rabbitEl; activeFood = carrotEl;
-                    foodNameSpan.textContent = "Carrots"; footerFoodNameSpan.textContent = "carrots";
+                    foodNameSpan.textContent = "Carrots";
                     toggleButton.textContent = "Change to Giraffe";
                 }
-                // A_WIDTH, A_HEIGHT etc. will be updated in gameLoop or resize based on getComputedStyle
+                updateActiveAnimalDimensions(); // Update dimensions for new active animal
+                updateActiveFoodDimensions();   // Update dimensions for new active food
+
+                // If animal changed, ensure old one is hidden and new one visible
+                if (oldAnimal !== activeAnimal) {
+                    oldAnimal.style.display = 'none'; // Explicitly hide old one
+                    activeAnimal.style.display = 'block'; // Explicitly show new one
+                }
                 activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
             }
 
+
             function initializeGame() {
-                updateActiveElements();
+                updateActiveElements(); // Sets activeAnimal and its dimensions (A_WIDTH, A_HEIGHT)
+
                 const paWidth = playArea.clientWidth;
                 const paHeight = playArea.clientHeight;
 
-                // Update dimensions based on current animal
-                A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width);
-                A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);
-
                 animalX = (paWidth - A_WIDTH) / 2;
-                animalY = paHeight - A_HEIGHT - 20;
+                animalY = paHeight - A_HEIGHT - (paHeight * 0.05); // Start 5% from bottom
                 animalScaleX = 1;
-                activeAnimal.style.left = `${animalX}px`;
-                activeAnimal.style.top = `${animalY}px`;
-                activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
-                const otherAnimal = (activeAnimal === rabbitEl) ? giraffeEl : rabbitEl;
-                otherAnimal.style.left = `${animalX}px`;
-                otherAnimal.style.top = `${animalY}px`;
+
+                // Set initial positions for BOTH animals, only one will be displayed by CSS
+                [rabbitEl, giraffeEl].forEach(el => {
+                    el.style.left = `${animalX}px`;
+                    el.style.top = `${animalY}px`; // Initial Y will be same, toggleMode adjusts
+                    el.style.setProperty('--animal-scaleX', animalScaleX.toString());
+                });
+
                 updateScore();
                 spawnNewFood();
                 requestAnimationFrame(gameLoop);
             }
 
             function toggleMode() {
-                const oldHeight = A_HEIGHT; // A_HEIGHT from previous activeAnimal
+                const oldHeight = A_HEIGHT;
                 body.classList.toggle('giraffe-mode');
-                updateActiveElements(); // This updates activeAnimal and its A_WIDTH, A_HEIGHT
-                
-                animalY += (oldHeight - A_HEIGHT); // Adjust Y based on new A_HEIGHT
+                // updateActiveElements will set the new activeAnimal and its A_HEIGHT
+                updateActiveElements();
+
+                animalY += (oldHeight - A_HEIGHT); // Adjust Y based on height difference
                 const paHeight = playArea.clientHeight;
-                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
-                
+                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT)); // Boundary check Y
+
+                // Update DOM for the now active animal
                 activeAnimal.style.left = `${animalX}px`;
                 activeAnimal.style.top = `${animalY}px`;
                 activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
-                
-                (isGiraffeMode ? carrotEl : lettuceEl).style.display = 'none';
-                spawnNewFood();
+
+                spawnNewFood(); // Spawns correct food and hides the other
             }
 
             function updateScore() { scoreDisplay.textContent = score; }
 
             function spawnNewFood() {
-                if (isGiraffeMode) { carrotEl.style.display = 'none'; activeFood = lettuceEl; }
-                else { lettuceEl.style.display = 'none'; activeFood = carrotEl; }
-                activeFood.style.display = 'block';
-                
+                if (isGiraffeMode) {
+                    carrotEl.style.display = 'none';
+                    lettuceEl.style.display = 'block';
+                    activeFood = lettuceEl;
+                } else {
+                    lettuceEl.style.display = 'none';
+                    carrotEl.style.display = 'block';
+                    activeFood = carrotEl;
+                }
+                updateActiveFoodDimensions(); // Update F_WIDTH, F_HEIGHT for the newly active food
+
                 const paWidth = playArea.clientWidth;
                 const paHeight = playArea.clientHeight;
-                F_WIDTH = parseFloat(getComputedStyle(activeFood).width);
-                F_HEIGHT = parseFloat(getComputedStyle(activeFood).height);
-                
-                const foodX = Math.random() * (paWidth - F_WIDTH - (paWidth * 0.05)) + (paWidth * 0.025); // Add some padding
-                const foodY = Math.random() * (paHeight - F_HEIGHT - (paHeight * 0.05)) + (paHeight * 0.025);
-                
+                const paddingX = paWidth * 0.05; // 5% padding
+                const paddingY = paHeight * 0.05; // 5% padding
+
+                const foodX = Math.random() * (paWidth - F_WIDTH - 2 * paddingX) + paddingX;
+                const foodY = Math.random() * (paHeight - F_HEIGHT - 2 * paddingY) + paddingY;
+
                 activeFood.style.left = `${foodX}px`;
                 activeFood.style.top = `${foodY}px`;
             }
@@ -281,21 +300,30 @@
                 setTimeout(spawnNewFood, isGiraffeMode ? 1200 : 800);
             }
 
-            function playFireworks(x, y) { const numParticles = 20; /* Fewer for mobile perf */ const colors = ['#FFD700', '#FFA500', '#FF6347', '#FF4500', '#FFFFFF']; for (let i = 0; i < numParticles; i++) { const particle = document.createElement('div'); particle.classList.add('firework-particle'); particle.style.left = `${x}px`; particle.style.top = `${y}px`; particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; const angle = Math.random() * Math.PI * 2; const distance = 40 + Math.random() * 60; /* Shorter distance */ const endRotate = Math.random() * 360 - 180; particle.style.setProperty('--particle-end-x', `calc(-50% + ${Math.cos(angle) * distance}px)`); particle.style.setProperty('--particle-end-y', `calc(-50% + ${Math.sin(angle) * distance}px)`); particle.style.setProperty('--particle-end-rotate', `${endRotate}deg`); celebrationContainer.appendChild(particle); setTimeout(() => particle.remove(), 800); } }
-            function playFlags(x, y) { const numParticles = 10; /* Fewer for mobile perf */ const flagColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFFF33']; for (let i = 0; i < numParticles; i++) { const particle = document.createElement('div'); particle.classList.add('flag-particle'); particle.style.left = `${x}px`; particle.style.top = `${y}px`; const flagSVG = `<svg viewBox="0 0 20 30" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="0" width="16" height="15" fill="${flagColors[Math.floor(Math.random() * flagColors.length)]}"/><line x1="10" y1="15" x2="10" y2="30" stroke="#A0522D" stroke-width="2"/></svg>`; particle.innerHTML = flagSVG; const angle = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 1.5; const distance = 50 + Math.random() * 80; /* Shorter distance */ const endRotate = (Math.random() - 0.5) * 90; const midRotate = (Math.random() - 0.5) * 30; particle.style.setProperty('--particle-mid-x', `${Math.cos(angle) * distance * 0.3}px`); particle.style.setProperty('--particle-mid-y', `${Math.sin(angle) * distance * 0.3}px`); particle.style.setProperty('--particle-mid-rotate', `${midRotate}deg`); particle.style.setProperty('--particle-end-x', `calc(-50% + ${Math.cos(angle) * distance}px)`); particle.style.setProperty('--particle-end-y', `calc(-50% + ${Math.sin(angle) * distance}px)`); particle.style.setProperty('--particle-end-rotate', `${endRotate}deg`); celebrationContainer.appendChild(particle); setTimeout(() => particle.remove(), 1200); } }
+            function playFireworks(x, y) { const numParticles = 15; /* Reduced for mobile */ const colors = ['#FFD700', '#FFA500', '#FF6347', '#FF4500', '#FFFFFF']; for (let i = 0; i < numParticles; i++) { const particle = document.createElement('div'); particle.classList.add('firework-particle'); particle.style.left = `${x}px`; particle.style.top = `${y}px`; particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; const angle = Math.random() * Math.PI * 2; const distance = 30 + Math.random() * 50; /* Reduced distance */ const endRotate = Math.random() * 360 - 180; particle.style.setProperty('--particle-end-x', `calc(-50% + ${Math.cos(angle) * distance}px)`); particle.style.setProperty('--particle-end-y', `calc(-50% + ${Math.sin(angle) * distance}px)`); particle.style.setProperty('--particle-end-rotate', `${endRotate}deg`); celebrationContainer.appendChild(particle); setTimeout(() => particle.remove(), 800); } }
+            function playFlags(x, y) { const numParticles = 8; /* Reduced for mobile */ const flagColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFFF33']; for (let i = 0; i < numParticles; i++) { const particle = document.createElement('div'); particle.classList.add('flag-particle'); particle.style.left = `${x}px`; particle.style.top = `${y}px`; const flagSVG = `<svg viewBox="0 0 20 30" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="0" width="16" height="15" fill="${flagColors[Math.floor(Math.random() * flagColors.length)]}"/><line x1="10" y1="15" x2="10" y2="30" stroke="#A0522D" stroke-width="2"/></svg>`; particle.innerHTML = flagSVG; const angle = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 1.5; const distance = 40 + Math.random() * 70; /* Reduced distance */ const endRotate = (Math.random() - 0.5) * 90; const midRotate = (Math.random() - 0.5) * 30; particle.style.setProperty('--particle-mid-x', `${Math.cos(angle) * distance * 0.3}px`); particle.style.setProperty('--particle-mid-y', `${Math.sin(angle) * distance * 0.3}px`); particle.style.setProperty('--particle-mid-rotate', `${midRotate}deg`); particle.style.setProperty('--particle-end-x', `calc(-50% + ${Math.cos(angle) * distance}px)`); particle.style.setProperty('--particle-end-y', `calc(-50% + ${Math.sin(angle) * distance}px)`); particle.style.setProperty('--particle-end-rotate', `${endRotate}deg`); celebrationContainer.appendChild(particle); setTimeout(() => particle.remove(), 1200); } }
 
             function gameLoop() {
                 let dx = 0; let dy = 0;
                 if (keysPressed['ArrowUp']) dy -= 1; if (keysPressed['ArrowDown']) dy += 1;
                 if (keysPressed['ArrowLeft']) dx -= 1; if (keysPressed['ArrowRight']) dx += 1;
+
                 if (gamepadIndex !== null && navigator.getGamepads) {
-                    const gp = navigator.getGamepads()[gamepadIndex];
-                    if (gp && gp.connected) {
-                        let axisX = gp.axes[0]; let axisY = gp.axes[1];
-                        if (Math.abs(axisX) > JOYSTICK_DEADZONE) dx += axisX;
-                        if (Math.abs(axisY) > JOYSTICK_DEADZONE) dy += axisY;
-                    } else if (gp && !gp.connected) { gamepadIndex = null; }
+                    const gamepadList = navigator.getGamepads();
+                    if (gamepadList && gamepadList[gamepadIndex]) { // Check if list and specific gamepad exist
+                        const gp = gamepadList[gamepadIndex];
+                        if (gp.connected) { // Ensure it's still connected
+                            let axisX = gp.axes[0]; let axisY = gp.axes[1];
+                            if (Math.abs(axisX) > JOYSTICK_DEADZONE) dx += axisX;
+                            if (Math.abs(axisY) > JOYSTICK_DEADZONE) dy += axisY;
+                        } else {
+                            gamepadIndex = null; // Was disconnected
+                        }
+                    } else {
+                         gamepadIndex = null; // Gamepad not found at this index
+                    }
                 }
+
                 if (dx !== 0 || dy !== 0) {
                     const magnitude = Math.sqrt(dx * dx + dy * dy);
                     const normalizedDx = dx / magnitude; const normalizedDy = dy / magnitude;
@@ -303,50 +331,68 @@
                     if (normalizedDx < -0.01) animalScaleX = -1;
                     else if (normalizedDx > 0.01) animalScaleX = 1;
                 }
-                A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width); // Update dimensions dynamically
-                A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);
+
+                updateActiveAnimalDimensions(); // Update A_WIDTH/A_HEIGHT before boundary check
+
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
                 animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
                 animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
-                activeAnimal.style.left = `${animalX}px`; activeAnimal.style.top = `${animalY}px`;
+
+                activeAnimal.style.left = `${animalX}px`;
+                activeAnimal.style.top = `${animalY}px`;
                 activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
-                if (activeFood && activeFood.style.display !== 'none') { checkCollision(); }
+
+                if (activeFood && activeFood.style.display === 'block') { // Check if food is visible
+                    checkCollision();
+                }
                 requestAnimationFrame(gameLoop);
             }
 
-            // Keyboard listeners
             document.addEventListener('keydown', (event) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); keysPressed[event.key] = true; } });
             document.addEventListener('keyup', (event) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); keysPressed[event.key] = false; } });
-            
-            // D-pad touch listeners
+
             function addDPadListener(element, keyName) {
                 element.addEventListener('touchstart', (e) => { e.preventDefault(); keysPressed[keyName] = true; }, { passive: false });
                 element.addEventListener('touchend', (e) => { e.preventDefault(); keysPressed[keyName] = false; }, { passive: false });
                 element.addEventListener('touchcancel', (e) => { e.preventDefault(); keysPressed[keyName] = false; }, { passive: false });
-                 // For mouse users on desktop with D-pad visible
                 element.addEventListener('mousedown', (e) => { e.preventDefault(); keysPressed[keyName] = true; });
                 element.addEventListener('mouseup', (e) => { e.preventDefault(); keysPressed[keyName] = false; });
-                element.addEventListener('mouseleave', (e) => { keysPressed[keyName] = false; }); // If mouse leaves button while pressed
+                element.addEventListener('mouseleave', (e) => { if(keysPressed[keyName]) keysPressed[keyName] = false; });
             }
-            addDPadListener(dPadUp, 'ArrowUp');
-            addDPadListener(dPadDown, 'ArrowDown');
-            addDPadListener(dPadLeft, 'ArrowLeft');
-            addDPadListener(dPadRight, 'ArrowRight');
+            addDPadListener(dPadUp, 'ArrowUp'); addDPadListener(dPadDown, 'ArrowDown');
+            addDPadListener(dPadLeft, 'ArrowLeft'); addDPadListener(dPadRight, 'ArrowRight');
 
-            // Gamepad listeners
-            window.addEventListener('gamepadconnected', (event) => { console.log('Gamepad connected:', event.gamepad.id); if (event.gamepad.axes.length >= 2 && (event.gamepad.id.toLowerCase().includes('xbox') || event.gamepad.id.toLowerCase().includes('xinput'))) { if (gamepadIndex === null) gamepadIndex = event.gamepad.index; } else if (gamepadIndex === null && event.gamepad.axes.length >=2) { gamepadIndex = event.gamepad.index; } });
-            window.addEventListener('gamepaddisconnected', (event) => { console.log('Gamepad disconnected:', event.gamepad.id); if (event.gamepad.index === gamepadIndex) gamepadIndex = null; });
-            
+            window.addEventListener('gamepadconnected', (event) => {
+                console.log('Gamepad connected:', event.gamepad.id, "Index:", event.gamepad.index);
+                if (gamepadIndex === null && event.gamepad.axes.length >= 2) { // Connect first suitable gamepad
+                     gamepadIndex = event.gamepad.index;
+                }
+            });
+            window.addEventListener('gamepaddisconnected', (event) => {
+                console.log('Gamepad disconnected:', event.gamepad.id);
+                if (event.gamepad.index === gamepadIndex) gamepadIndex = null;
+            });
+
             toggleButton.addEventListener('click', toggleMode);
+
             window.addEventListener('resize', () => {
-                // Recalculate active animal dimensions on resize
-                A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width);
-                A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);
+                updateActiveAnimalDimensions(); // Update animal size
+                updateActiveFoodDimensions();   // Update food size
 
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
-                animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
+                animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH)); // Keep animal in bounds
                 animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
-                spawnNewFood();
+
+                // Re-position food if it's out of bounds due to resize, or just respawn
+                if (activeFood && activeFood.style.display === 'block') {
+                    const foodLeft = parseFloat(activeFood.style.left);
+                    const foodTop = parseFloat(activeFood.style.top);
+                    if (foodLeft + F_WIDTH > paWidth || foodTop + F_HEIGHT > paHeight || foodLeft < 0 || foodTop < 0) {
+                        spawnNewFood();
+                    }
+                } else if (activeFood) { // If food was hidden but should be visible
+                    spawnNewFood();
+                }
             });
             initializeGame();
         });
