@@ -43,7 +43,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
+            position: relative; /* Important for positioning D-pad within it */
         }
         #play-area {
             width: 100%;
@@ -86,39 +86,56 @@
             box-sizing: border-box; z-index: 100;
         }
 
-        /* --- Larger On-Screen Controls --- */
-        #d-pad-container {
+        /* --- Full-Width Bottom Controls --- */
+        .control-row {
             position: fixed;
-            bottom: clamp(15px, 4vh, 30px); /* Adjusted positioning */
-            left: clamp(15px, 4vw, 30px);
-            width: clamp(130px, 30vmin, 180px); /* Increased size */
-            height: clamp(130px, 30vmin, 180px); /* Increased size */
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-            gap: 3px; /* Slightly larger gap for larger buttons */
+            left: 0;
+            width: 100%;
+            display: flex;
             z-index: 200;
             opacity: 0.65;
+            box-sizing: border-box; /* Include padding/border in width */
         }
-        .d-pad-button {
+
+        #bottom-controls { /* For Left and Right */
+            bottom: 0;
+            height: clamp(70px, 15vh, 120px); /* Substantial height */
+            gap: 2px; /* Gap between left and right */
+        }
+
+        #middle-controls { /* For Up and Down */
+            bottom: clamp(72px, 15.5vh, 122px); /* Positioned above bottom-controls (height + gap) */
+            height: clamp(60px, 12vh, 100px); /* Slightly less height than L/R */
+            justify-content: center; /* Center the up/down buttons */
+            gap: 2px;
+        }
+
+        .control-button {
+            flex-grow: 1; /* Buttons share space */
             background-color: rgba(80, 80, 80, 0.7);
             border: 1px solid rgba(180, 180, 180, 0.8);
-            border-radius: 12px; /* Larger radius for larger buttons */
+            border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: clamp(1.8em, 6vmin, 2.5em); /* Increased font size for arrows */
+            font-size: clamp(2em, 7vmin, 3.5em); /* Very large font for arrows */
             color: white;
             user-select: none;
             cursor: pointer;
+            box-sizing: border-box;
         }
-        .d-pad-button:active {
+        .control-button:active {
             background-color: rgba(120, 120, 120, 0.9);
         }
-        #d-pad-up    { grid-column: 2; grid-row: 1; }
-        #d-pad-left  { grid-column: 1; grid-row: 2; }
-        #d-pad-right { grid-column: 3; grid-row: 2; }
-        #d-pad-down  { grid-column: 2; grid-row: 3; }
+
+        #bottom-controls .control-button { /* L/R buttons take half width each */
+            flex-basis: 50%;
+        }
+        #middle-controls .control-button { /* Up/Down buttons take a portion of width */
+            flex-basis: 40%; /* e.g. 40% of total width, adjust as needed */
+            max-width: 200px; /* Optional max width for very wide screens */
+        }
+
 
     </style>
 </head>
@@ -139,12 +156,16 @@
     </main>
     <footer> <p>Eleanor's Animal Adventure!</p> </footer>
 
-    <div id="d-pad-container">
-        <div class="d-pad-button" id="d-pad-up">▲</div>
-        <div class="d-pad-button" id="d-pad-left">◄</div>
-        <div class="d-pad-button" id="d-pad-right">►</div>
-        <div class="d-pad-button" id="d-pad-down">▼</div>
+    <!-- On-Screen Controls -->
+    <div class="control-row" id="middle-controls">
+        <div class="control-button" id="d-pad-up">▲</div>
+        <div class="control-button" id="d-pad-down">▼</div>
     </div>
+    <div class="control-row" id="bottom-controls">
+        <div class="control-button" id="d-pad-left">◄</div>
+        <div class="control-button" id="d-pad-right">►</div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
