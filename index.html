@@ -16,9 +16,7 @@
             --button-border: #D0D0D0;
             --text-color-light: white;
             --text-color-dark: #333;
-            --dpad-bg: rgba(80, 80, 80, 0.7);
-            --dpad-border: rgba(180, 180, 180, 0.8);
-            --dpad-active-bg: rgba(120, 120, 120, 0.9);
+            /* Removed D-pad specific colors */
         }
 
         body.giraffe-mode {
@@ -55,14 +53,18 @@
         }
         header h1 { margin: 0; font-size: 1.1em; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
         #score-board { font-size: 0.85em; margin-top: 2px; font-weight: bold; }
-        #toggle-button {
+        #toggle-button, #enable-motion-button {
             padding: 5px 10px; font-size: 0.8em; margin-top: 2px; margin-bottom: 2px;
             cursor: pointer; background-color: var(--button-bg); color: var(--text-color-dark);
             border: 1px solid var(--button-border);
             border-radius: 4px; font-family: inherit;
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        #toggle-button:hover, #toggle-button:active { background-color: #E0E0E0; }
+        #toggle-button:hover, #toggle-button:active,
+        #enable-motion-button:hover, #enable-motion-button:active { background-color: #E0E0E0; }
+        #enable-motion-button { margin-left: 8px; }
+        #enable-motion-button:disabled { background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed; }
+
 
         main { flex-grow: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
         #play-area {
@@ -110,15 +112,7 @@
             padding: 2px 0; width: 100%; font-size: 0.65em; flex-shrink: 0;
             box-sizing: border-box; z-index: 100; transition: background-color 0.5s ease;
         }
-
-        .control-row { position: fixed; left: 0; width: 100%; display: flex; z-index: 200; opacity: 0.65; box-sizing: border-box; }
-        #bottom-controls { bottom: 0; height: clamp(70px, 15vh, 120px); gap: 2px; }
-        #middle-controls { bottom: clamp(72px, 15.5vh, 122px); height: clamp(60px, 12vh, 100px); justify-content: center; gap: 2px;}
-        .control-button { flex-grow: 1; background-color: var(--dpad-bg); border: 1px solid var(--dpad-border); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: clamp(2em, 7vmin, 3.5em); color: var(--text-color-light); user-select: none; cursor: pointer; box-sizing: border-box; }
-        .control-button:active { background-color: var(--dpad-active-bg); }
-        #bottom-controls .control-button { flex-basis: 50%; }
-        #middle-controls .control-button { flex-basis: 40%; max-width: 200px; }
-
+        /* Removed .control-row and related styles */
     </style>
 </head>
 <body>
@@ -126,6 +120,7 @@
         <h1>Eleanor's Animal Adventure!</h1>
         <div id="score-board"><span id="food-name">Carrots</span>: <span id="score-display">0</span></div>
         <button id="toggle-button">Change Animal</button>
+        <button id="enable-motion-button" style="display: none;">Enable Tilt</button>
     </header>
     <main>
         <div id="play-area">
@@ -139,12 +134,11 @@
         </div>
     </main>
     <footer> <p>Eleanor's Animal Adventure!</p> </footer>
-    <div class="control-row" id="middle-controls"> <div class="control-button" id="d-pad-up">▲</div> <div class="control-button" id="d-pad-down">▼</div> </div>
-    <div class="control-row" id="bottom-controls"> <div class="control-button" id="d-pad-left">◄</div> <div class="control-button" id="d-pad-right">►</div> </div>
+    <!-- D-pad HTML removed -->
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const playArea = document.getElementById('play-area'); // <<< FIXED: Explicitly get play-area
+            const playArea = document.getElementById('play-area');
             const body = document.body;
             const rabbitEl = document.getElementById('rabbit');
             const giraffeEl = document.getElementById('giraffe');
@@ -156,10 +150,7 @@
             const scoreDisplay = document.getElementById('score-display');
             const foodNameSpan = document.getElementById('food-name');
             const toggleButton = document.getElementById('toggle-button');
-            const dPadUp = document.getElementById('d-pad-up');
-            const dPadDown = document.getElementById('d-pad-down');
-            const dPadLeft = document.getElementById('d-pad-left');
-            const dPadRight = document.getElementById('d-pad-right');
+            // D-pad element variables removed
 
             const MODES = { RABBIT: 0, GIRAFFE: 1, ELEPHANT: 2 };
             const MODE_COUNT = Object.keys(MODES).length;
@@ -168,12 +159,109 @@
             let activeAnimal = rabbitEl;
             let activeFood = carrotEl;
             let A_WIDTH, A_HEIGHT, F_WIDTH, F_HEIGHT;
-            let moveSpeed = 5;
+            let moveSpeed = 5; // Base speed
             let animalX, animalY;
             let animalScaleX = 1;
             const keysPressed = {};
             let gamepadIndex = null;
             const JOYSTICK_DEADZONE = 0.25;
+
+            // Gyroscope related variables
+            let motionControlsEnabled = false;
+            let currentGyroX = 0; // Stores processed tilt for X-axis (-1 to 1)
+            let currentGyroY = 0; // Stores processed tilt for Y-axis (-1 to 1)
+            const TILT_DEADZONE = 3;     // Degrees of tilt before movement registers
+            const MAX_EFFECTIVE_ANGLE = 30; // Tilt angle (degrees) that produces max input (1.0)
+            const MAX_TILT_INPUT = 1.0;  // Max contribution from gyro to dx/dy (usually 1.0)
+            let enableMotionButton = document.getElementById('enable-motion-button');
+
+
+            function handleOrientation(event) {
+                if (!motionControlsEnabled) return;
+
+                let gamma = event.gamma || 0; // Left-Right tilt (roll). Positive: screen tilted to its right.
+                let beta = event.beta || 0;   // Front-Back tilt (pitch). Positive: screen's top tilted away from user.
+
+                // Assuming portrait orientation for simplicity.
+                // Tilting phone right (positive gamma) -> animal moves right (+dx)
+                // Tilting phone top away (positive beta) -> animal moves down (+dy)
+
+                let tiltX = 0;
+                if (Math.abs(gamma) > TILT_DEADZONE) {
+                    tiltX = gamma;
+                }
+
+                let tiltY = 0;
+                if (Math.abs(beta) > TILT_DEADZONE) {
+                    tiltY = beta;
+                }
+                
+                currentGyroX = Math.max(-MAX_TILT_INPUT, Math.min(MAX_TILT_INPUT, tiltX / MAX_EFFECTIVE_ANGLE));
+                currentGyroY = Math.max(-MAX_TILT_INPUT, Math.min(MAX_TILT_INPUT, tiltY / MAX_EFFECTIVE_ANGLE));
+            }
+
+            function checkMobileControls(message) {
+                const isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+                if (isTouchDevice && !motionControlsEnabled) {
+                    const footerP = document.querySelector('footer p');
+                    if (footerP && !footerP.querySelector('.tilt-notice')) {
+                        const notice = document.createElement('span');
+                        notice.className = 'tilt-notice';
+                        notice.textContent = " " + message;
+                        notice.style.color = "yellow";
+                        notice.style.fontWeight = "bold";
+                        notice.style.fontSize = "0.9em";
+                        footerP.appendChild(notice);
+                    }
+                    console.warn("Tilt control notice:", message);
+                }
+            }
+
+            function requestMotionPermission() {
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('portrait-primary')
+                        .then(() => console.log("Screen locked to portrait."))
+                        .catch(err => console.warn("Screen orientation lock failed:", err));
+                }
+
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation);
+                                motionControlsEnabled = true;
+                                if(enableMotionButton) enableMotionButton.style.display = 'none';
+                                console.log("Device orientation permission granted.");
+                            } else {
+                                console.log("Device orientation permission denied.");
+                                if(enableMotionButton) enableMotionButton.textContent = "Tilt Denied";
+                                checkMobileControls("Tilt permission denied. Game may be unplayable without keyboard/gamepad.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error requesting device orientation permission:", error);
+                            if(enableMotionButton) {
+                                enableMotionButton.textContent = "Tilt Error";
+                                enableMotionButton.style.display = 'block'; // Show again if error
+                            }
+                            checkMobileControls("Error enabling tilt controls. Game may be unplayable without keyboard/gamepad.");
+                        });
+                } else if (typeof DeviceOrientationEvent !== 'undefined') {
+                    window.addEventListener('deviceorientation', handleOrientation);
+                    motionControlsEnabled = true;
+                    if(enableMotionButton) enableMotionButton.style.display = 'none';
+                    console.log("Device orientation supported (no explicit permission needed or already granted).");
+                } else {
+                    console.log("Device orientation not supported by this browser.");
+                    if(enableMotionButton) {
+                        enableMotionButton.textContent = "Tilt Not Supported";
+                        enableMotionButton.disabled = true;
+                        enableMotionButton.style.display = 'block';
+                    }
+                    checkMobileControls("Tilt controls not supported by this device/browser. Game may be unplayable without keyboard/gamepad.");
+                }
+            }
+
 
             function updateActiveAnimalDimensions() { if(activeAnimal) {A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width); A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);} }
             function updateActiveFoodDimensions() { if(activeFood) {F_WIDTH = parseFloat(getComputedStyle(activeFood).width); F_HEIGHT = parseFloat(getComputedStyle(activeFood).height);} }
@@ -189,8 +277,8 @@
                     case MODES.ELEPHANT: body.classList.add('elephant-mode'); activeAnimal = elephantEl; activeFood = mangoEl; foodNameSpan.textContent = "Mangoes"; break;
                 }
                 
-                if (activeAnimal) activeAnimal.style.display = 'block'; // Ensure visible before getting dimensions
-                if (activeFood) activeFood.style.display = 'none'; // Hide food initially, spawnNewFood will show it
+                if (activeAnimal) activeAnimal.style.display = 'block';
+                if (activeFood) activeFood.style.display = 'none'; 
 
                 updateActiveAnimalDimensions(); 
                 updateActiveFoodDimensions();
@@ -198,21 +286,17 @@
                 if (oldAnimal && oldAnimal !== activeAnimal) oldAnimal.style.display = 'none';
                 if (oldFood && oldFood !== activeFood) oldFood.style.display = 'none';
                 
-                // activeAnimal.style.display = 'block'; already done
-                // activeFood will be positioned and displayed by spawnNewFood
-
                 if (activeAnimal) activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
             }
 
             function initializeGame() {
                 applyModeStylesAndElements();
-                // Ensure playArea is valid and has dimensions before proceeding
                 if (!playArea || playArea.clientWidth === 0 || playArea.clientHeight === 0) {
                     console.error("Play area not found or has no dimensions. Retrying initialization soon.");
-                    setTimeout(initializeGame, 100); // Retry if dimensions are not ready
+                    setTimeout(initializeGame, 100); 
                     return;
                 }
-                updateActiveAnimalDimensions(); // Make sure A_WIDTH/A_HEIGHT are fresh after mode apply and potential display changes
+                updateActiveAnimalDimensions();
 
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
                 animalX = (paWidth - A_WIDTH) / 2; animalY = paHeight - A_HEIGHT - (paHeight * 0.05); animalScaleX = 1;
@@ -227,14 +311,10 @@
             function toggleMode() {
                 const oldHeight = A_HEIGHT; 
                 currentMode = (currentMode + 1) % MODE_COUNT; 
-                applyModeStylesAndElements(); // This now correctly updates A_WIDTH, A_HEIGHT for the new animal
-                
-                // Adjust animalY based on the height difference of the old and new animal
-                // to keep its bottom roughly at the same position.
+                applyModeStylesAndElements(); 
                 animalY += (oldHeight - A_HEIGHT); 
-                
                 const paHeight = playArea.clientHeight; 
-                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT)); // Clamp Y within bounds
+                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
                 
                 if(activeAnimal) { 
                     activeAnimal.style.left = `${animalX}px`; 
@@ -247,31 +327,21 @@
             function updateScore() { scoreDisplay.textContent = score; }
             
             function spawnNewFood() {
-                // Call applyModeStylesAndElements to ensure activeFood is correct,
-                // but it might hide it. We need to ensure it's visible after this.
-                // applyModeStylesAndElements(); // This was causing food to hide then re-appear. Not needed here if mode doesn't change.
-                
-                // Ensure current food for the mode is selected and its dimensions are known.
-                // applyModeStylesAndElements already does this, but if called from collectFood,
-                // activeFood might point to the old collected food.
-                // Let's ensure activeFood is the one for the current mode.
                 switch (currentMode) {
                     case MODES.RABBIT: activeFood = carrotEl; break;
                     case MODES.GIRAFFE: activeFood = lettuceEl; break;
                     case MODES.ELEPHANT: activeFood = mangoEl; break;
                 }
-                updateActiveFoodDimensions(); // Get dimensions for the *correct* food
+                updateActiveFoodDimensions();
 
-                if (!activeFood || !playArea || playArea.clientWidth === 0) { // Guard if food or playArea not ready
+                if (!activeFood || !playArea || playArea.clientWidth === 0) { 
                     console.warn("Cannot spawn food: Active food or play area not ready.");
                     return; 
                 }
-                
-                activeFood.style.display = 'block'; // Make sure the correct food is visible
-
-                if (!F_WIDTH || !F_HEIGHT) { // Guard if food dimensions not ready after display block
+                activeFood.style.display = 'block';
+                if (!F_WIDTH || !F_HEIGHT) {
                      console.warn("Cannot spawn food: Food dimensions not ready. Retrying update.");
-                     updateActiveFoodDimensions(); // Try once more
+                     updateActiveFoodDimensions(); 
                      if (!F_WIDTH || !F_HEIGHT) {
                         console.error("Food dimensions still not ready after retry. Aborting spawn.");
                         return;
@@ -280,10 +350,8 @@
 
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
                 const paddingX = paWidth * 0.05; const paddingY = paHeight * 0.05;
-                
                 const foodX = Math.random() * (paWidth - F_WIDTH - 2 * paddingX) + paddingX;
                 const foodY = Math.random() * (paHeight - F_HEIGHT - 2 * paddingY) + paddingY;
-                
                 activeFood.style.left = `${foodX}px`; 
                 activeFood.style.top = `${foodY}px`;
             }
@@ -298,10 +366,9 @@
 
             function collectFood() {
                 score++; updateScore(); 
-                if (!activeFood || !F_WIDTH || !F_HEIGHT) return; // Added F_HEIGHT check
+                if (!activeFood || !F_WIDTH || !F_HEIGHT) return;
                 const foodCenterX = parseFloat(activeFood.style.left) + F_WIDTH / 2;
                 const foodCenterY = parseFloat(activeFood.style.top) + F_HEIGHT / 2;
-                
                 activeFood.style.display = 'none'; 
                 let celebrationDelay = 800;
                 switch(currentMode) {
@@ -318,9 +385,14 @@
 
             function gameLoop() {
                 let dx = 0; let dy = 0;
-                if (keysPressed['ArrowUp']) dy -= 1; if (keysPressed['ArrowDown']) dy += 1;
-                if (keysPressed['ArrowLeft']) dx -= 1; if (keysPressed['ArrowRight']) dx += 1;
 
+                // Keyboard input
+                if (keysPressed['ArrowUp']) dy -= 1; 
+                if (keysPressed['ArrowDown']) dy += 1;
+                if (keysPressed['ArrowLeft']) dx -= 1; 
+                if (keysPressed['ArrowRight']) dx += 1;
+
+                // Gamepad input
                 if (gamepadIndex !== null && typeof navigator.getGamepads === "function") {
                     const gamepadList = navigator.getGamepads();
                     if (gamepadList && gamepadList[gamepadIndex]) {
@@ -334,9 +406,15 @@
                     } else { gamepadIndex = null; }
                 }
 
+                // Gyroscope input
+                if (motionControlsEnabled) {
+                    dx += currentGyroX;
+                    dy += currentGyroY;
+                }
+
+
                 if (dx !== 0 || dy !== 0) {
                     const magnitude = Math.sqrt(dx * dx + dy * dy);
-                    // Avoid division by zero if magnitude is somehow zero with non-zero dx/dy (should not happen with current logic)
                     const normalizedDx = magnitude === 0 ? 0 : dx / magnitude; 
                     const normalizedDy = magnitude === 0 ? 0 : dy / magnitude;
                     animalX += normalizedDx * moveSpeed; 
@@ -344,12 +422,6 @@
                     if (normalizedDx < -0.01) animalScaleX = -1;
                     else if (normalizedDx > 0.01) animalScaleX = 1;
                 }
-
-                // It's generally better to update dimensions only on resize or mode change,
-                // but if animal size could change dynamically per frame, keep it.
-                // For now, let's assume it's not strictly needed every frame unless sizes change.
-                // updateActiveAnimalDimensions(); // Moved to initialize and mode toggle for efficiency. Re-add if dynamic sizing is needed per frame.
-
 
                 if (!A_WIDTH || !A_HEIGHT || !playArea || playArea.clientWidth === 0) { 
                      requestAnimationFrame(gameLoop); return;
@@ -370,29 +442,20 @@
 
             document.addEventListener('keydown', (event) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); keysPressed[event.key] = true; } });
             document.addEventListener('keyup', (event) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); keysPressed[event.key] = false; } });
-            function addDPadListener(element, keyName) {
-                element.addEventListener('touchstart', (e) => { e.preventDefault(); keysPressed[keyName] = true; }, { passive: false });
-                element.addEventListener('touchend', (e) => { e.preventDefault(); keysPressed[keyName] = false; }, { passive: false });
-                element.addEventListener('touchcancel', (e) => { e.preventDefault(); keysPressed[keyName] = false; }, { passive: false });
-                element.addEventListener('mousedown', (e) => { e.preventDefault(); keysPressed[keyName] = true; });
-                element.addEventListener('mouseup', (e) => { e.preventDefault(); keysPressed[keyName] = false; });
-                element.addEventListener('mouseleave', (e) => { if(keysPressed[keyName]) keysPressed[keyName] = false; });
-            }
-            addDPadListener(dPadUp, 'ArrowUp'); addDPadListener(dPadDown, 'ArrowDown');
-            addDPadListener(dPadLeft, 'ArrowLeft'); addDPadListener(dPadRight, 'ArrowRight');
+            
+            // Removed D-pad listeners
+            
             window.addEventListener('gamepadconnected', (event) => { if (gamepadIndex === null && event.gamepad && event.gamepad.axes && event.gamepad.axes.length >= 2) gamepadIndex = event.gamepad.index; });
             window.addEventListener('gamepaddisconnected', (event) => { if (event.gamepad && event.gamepad.index === gamepadIndex) gamepadIndex = null; });
             toggleButton.addEventListener('click', toggleMode);
             
             window.addEventListener('resize', () => {
-                if (!playArea) return; // Guard
+                if (!playArea) return; 
                 updateActiveAnimalDimensions(); 
                 updateActiveFoodDimensions();
                 
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
-                
-                // Recalculate animal position to stay within new bounds, trying to maintain relative position
-                if (A_WIDTH > 0 && A_HEIGHT > 0) { // Avoid division by zero if dimensions are not ready
+                if (A_WIDTH > 0 && A_HEIGHT > 0) {
                     animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
                     animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
                      if(activeAnimal) {
@@ -400,7 +463,6 @@
                         activeAnimal.style.top = `${animalY}px`;
                     }
                 }
-
                 if (activeFood && activeFood.style.display === 'block') {
                     const foodLeft = parseFloat(activeFood.style.left); 
                     const foodTop = parseFloat(activeFood.style.top);
@@ -411,6 +473,26 @@
                     spawnNewFood(); 
                 }
             });
+
+            // Initialize Gyroscope controls
+            if (typeof DeviceOrientationEvent !== 'undefined') {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') { // iOS 13+ requires permission
+                    if(enableMotionButton) {
+                        enableMotionButton.style.display = 'inline-block'; // Show the button
+                        enableMotionButton.addEventListener('click', requestMotionPermission);
+                    }
+                } else { // Android or older iOS - try to enable directly
+                    requestMotionPermission(); 
+                }
+            } else { // DeviceOrientationEvent not supported
+                 if(enableMotionButton) {
+                    enableMotionButton.style.display = 'inline-block';
+                    enableMotionButton.textContent = "Tilt N/A";
+                    enableMotionButton.disabled = true;
+                 }
+                 checkMobileControls("Tilt controls are not supported on this device/browser.");
+            }
+
             initializeGame();
         });
     </script>
