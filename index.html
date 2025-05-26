@@ -5,54 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Eleanor's Animal Adventure!</title>
     <style>
+        :root {
+            /* Default (Rabbit Mode) Colors */
+            --bg-color: #87CEEB; /* Sky Blue */
+            --header-bg: #FFB6C1; /* Light Pink */
+            --play-area-bg: #90EE90; /* Light Green */
+            --play-area-border: #6B8E23; /* Darker Green */
+            --footer-bg: #FFB6C1; /* Light Pink */
+            --button-bg: #F0F0F0;
+            --button-border: #D0D0D0;
+            --text-color-light: white;
+            --text-color-dark: #333;
+            --dpad-bg: rgba(80, 80, 80, 0.7);
+            --dpad-border: rgba(180, 180, 180, 0.8);
+            --dpad-active-bg: rgba(120, 120, 120, 0.9);
+        }
+
+        body.giraffe-mode {
+            --bg-color: #FFE4B5; /* Moccasin (Savannah-like) */
+            --header-bg: #DAA520; /* Goldenrod */
+            --play-area-bg: #F0E68C; /* Khaki */
+            --play-area-border: #B8860B; /* DarkGoldenrod */
+            --footer-bg: #DAA520;
+        }
+
+        body.elephant-mode {
+            --bg-color: #ADD8E6; /* Light Blue (Watery) */
+            --header-bg: #4682B4; /* SteelBlue */
+            --play-area-bg: #98FB98; /* PaleGreen (Lush) */
+            --play-area-border: #2E8B57; /* SeaGreen */
+            --footer-bg: #4682B4;
+        }
+
+
         html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
+            width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif;
-            background-color: #87CEEB;
+            background-color: var(--bg-color);
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            transition: background-color 0.5s ease;
         }
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        body { display: flex; flex-direction: column; align-items: center; }
         header {
-            background-color: #FFB6C1; color: white; padding: 3px 10px;
+            background-color: var(--header-bg); color: var(--text-color-light); padding: 3px 10px;
             text-align: center; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            z-index: 100;
-            flex-shrink: 0;
-            box-sizing: border-box;
+            z-index: 100; flex-shrink: 0; box-sizing: border-box;
+            transition: background-color 0.5s ease;
         }
-        header h1 { margin: 0; font-size: 1.1em; text-shadow: 1px 1px 1px #c88a97; }
+        header h1 { margin: 0; font-size: 1.1em; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
         #score-board { font-size: 0.85em; margin-top: 2px; font-weight: bold; }
         #toggle-button {
             padding: 5px 10px; font-size: 0.8em; margin-top: 2px; margin-bottom: 2px;
-            cursor: pointer; background-color: #F0F0F0; border: 1px solid #D0D0D0;
+            cursor: pointer; background-color: var(--button-bg); color: var(--text-color-dark);
+            border: 1px solid var(--button-border);
             border-radius: 4px; font-family: inherit;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         #toggle-button:hover, #toggle-button:active { background-color: #E0E0E0; }
 
-        main {
-            flex-grow: 1;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative; /* Important for positioning D-pad within it */
-        }
+        main { flex-grow: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
         #play-area {
-            width: 100%;
-            height: 100%;
-            background-color: #90EE90;
-            border: 2px solid #6B8E23;
-            position: relative;
-            overflow: hidden;
-            box-sizing: border-box;
+            width: 100%; height: 100%;
+            background-color: var(--play-area-bg);
+            border: 2px solid var(--play-area-border);
+            position: relative; overflow: hidden; box-sizing: border-box;
+            transition: background-color 0.5s ease, border-color 0.5s ease;
         }
         .animal, .food {
             position: absolute; display: none;
@@ -61,81 +79,45 @@
         }
         #rabbit { width: clamp(55px, 9vw, 80px); height: auto; aspect-ratio: 100 / 120; z-index: 5; animation: subtleHop 2s infinite ease-in-out; --animal-scaleX: 1; }
         #giraffe { width: clamp(45px, 8vw, 70px); height: auto; aspect-ratio: 100 / 180; z-index: 5; animation: subtleSway 3s infinite ease-in-out; --animal-scaleX: 1; }
+        #elephant { width: clamp(70px, 12vw, 100px); height: auto; aspect-ratio: 150 / 120; z-index: 5; animation: elephantWalk 2.5s infinite ease-in-out; --animal-scaleX: 1; }
+
         #carrot { width: clamp(22px, 4.5vw, 35px); height: auto; aspect-ratio: 40 / 70; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
         #lettuce { width: clamp(28px, 5.5vw, 45px); height: auto; aspect-ratio: 60 / 50; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
+        #mango { width: clamp(25px, 5vw, 40px); height: auto; aspect-ratio: 50 / 60; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
 
-        body:not(.giraffe-mode) #rabbit, body:not(.giraffe-mode) #carrot { display: block; }
+        body:not(.giraffe-mode):not(.elephant-mode) #rabbit,
+        body:not(.giraffe-mode):not(.elephant-mode) #carrot { display: block; }
         body.giraffe-mode #giraffe, body.giraffe-mode #lettuce { display: block; }
+        body.elephant-mode #elephant, body.elephant-mode #mango { display: block; }
 
         @keyframes subtleHop { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(-3px); } }
         @keyframes subtleSway { 0%, 100% { transform: scaleX(var(--animal-scaleX)) rotate(0deg); } 50% { transform: scaleX(var(--animal-scaleX)) rotate(1.5deg); } 75% { transform: scaleX(var(--animal-scaleX)) rotate(-1.5deg); } }
+        @keyframes elephantWalk { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg); } 25% { transform: scaleX(var(--animal-scaleX)) translateY(-2px) rotate(-1deg); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg); } 75% { transform: scaleX(var(--animal-scaleX)) translateY(-2px) rotate(1deg); } }
 
         #celebration-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 20; }
-        .firework-particle, .flag-particle { position: absolute; will-change: transform, opacity; }
+        .firework-particle, .flag-particle, .water-particle { position: absolute; will-change: transform, opacity; }
         .firework-particle { width: 6px; height: 6px; border-radius: 50%; animation: explodeAnim 0.8s ease-out forwards; }
         .flag-particle { width: 15px; height: 22px; animation: flagWaveAnim 1.2s ease-out forwards; }
         .flag-particle svg { width: 100%; height: 100%; display: block; }
+        .water-particle { width: clamp(5px, 1.5vmin, 10px); height: clamp(10px, 3vmin, 20px); background-color: rgba(100, 150, 255, 0.7); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; animation: waterSprayAnim 1s ease-out forwards; }
 
         @keyframes explodeAnim { 0% { transform: translate(var(--particle-start-x, -50%), var(--particle-start-y, -50%)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--particle-end-x), var(--particle-end-y)) scale(0.3) rotate(var(--particle-end-rotate, 0deg)); opacity: 0; } }
         @keyframes flagWaveAnim { 0% { transform: translate(var(--particle-start-x, -50%), var(--particle-start-y, -50%)) scale(1) rotate(0deg); opacity: 1; } 20% { transform: translate(calc(var(--particle-start-x, -50%) + var(--particle-mid-x, 0px)), calc(var(--particle-start-y, -50%) + var(--particle-mid-y, 0px) - 15px)) scale(1.1) rotate(var(--particle-mid-rotate, 0deg)); opacity: 1; } 100% { transform: translate(var(--particle-end-x), var(--particle-end-y)) scale(0.5) rotate(var(--particle-end-rotate, 0deg)); opacity: 0; } }
+        @keyframes waterSprayAnim { 0% { transform: translate(var(--particle-start-x, -50%), var(--particle-start-y, -50%)) scale(1) rotate(var(--initial-spray-rotate, -45deg)); opacity: 1; } 100% { transform: translate(var(--particle-end-x), var(--particle-end-y)) scale(0.2) rotate(var(--initial-spray-rotate, -45deg)); opacity: 0; } }
 
         footer {
-            background-color: #FFB6C1; color: white; text-align: center;
-            padding: 2px 0; width: 100%;
-            font-size: 0.65em; flex-shrink: 0;
-            box-sizing: border-box; z-index: 100;
+            background-color: var(--footer-bg); color: var(--text-color-light); text-align: center;
+            padding: 2px 0; width: 100%; font-size: 0.65em; flex-shrink: 0;
+            box-sizing: border-box; z-index: 100; transition: background-color 0.5s ease;
         }
 
-        /* --- Full-Width Bottom Controls --- */
-        .control-row {
-            position: fixed;
-            left: 0;
-            width: 100%;
-            display: flex;
-            z-index: 200;
-            opacity: 0.65;
-            box-sizing: border-box; /* Include padding/border in width */
-        }
-
-        #bottom-controls { /* For Left and Right */
-            bottom: 0;
-            height: clamp(70px, 15vh, 120px); /* Substantial height */
-            gap: 2px; /* Gap between left and right */
-        }
-
-        #middle-controls { /* For Up and Down */
-            bottom: clamp(72px, 15.5vh, 122px); /* Positioned above bottom-controls (height + gap) */
-            height: clamp(60px, 12vh, 100px); /* Slightly less height than L/R */
-            justify-content: center; /* Center the up/down buttons */
-            gap: 2px;
-        }
-
-        .control-button {
-            flex-grow: 1; /* Buttons share space */
-            background-color: rgba(80, 80, 80, 0.7);
-            border: 1px solid rgba(180, 180, 180, 0.8);
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: clamp(2em, 7vmin, 3.5em); /* Very large font for arrows */
-            color: white;
-            user-select: none;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-        .control-button:active {
-            background-color: rgba(120, 120, 120, 0.9);
-        }
-
-        #bottom-controls .control-button { /* L/R buttons take half width each */
-            flex-basis: 50%;
-        }
-        #middle-controls .control-button { /* Up/Down buttons take a portion of width */
-            flex-basis: 40%; /* e.g. 40% of total width, adjust as needed */
-            max-width: 200px; /* Optional max width for very wide screens */
-        }
-
+        .control-row { position: fixed; left: 0; width: 100%; display: flex; z-index: 200; opacity: 0.65; box-sizing: border-box; }
+        #bottom-controls { bottom: 0; height: clamp(70px, 15vh, 120px); gap: 2px; }
+        #middle-controls { bottom: clamp(72px, 15.5vh, 122px); height: clamp(60px, 12vh, 100px); justify-content: center; gap: 2px;}
+        .control-button { flex-grow: 1; background-color: var(--dpad-bg); border: 1px solid var(--dpad-border); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: clamp(2em, 7vmin, 3.5em); color: var(--text-color-light); user-select: none; cursor: pointer; box-sizing: border-box; }
+        .control-button:active { background-color: var(--dpad-active-bg); }
+        #bottom-controls .control-button { flex-basis: 50%; }
+        #middle-controls .control-button { flex-basis: 40%; max-width: 200px; }
 
     </style>
 </head>
@@ -143,191 +125,246 @@
     <header>
         <h1>Eleanor's Animal Adventure!</h1>
         <div id="score-board"><span id="food-name">Carrots</span>: <span id="score-display">0</span></div>
-        <button id="toggle-button">Change to Giraffe</button>
+        <button id="toggle-button">Change Animal</button>
     </header>
     <main>
         <div id="play-area">
             <svg id="rabbit" class="animal" viewBox="0 0 100 120"> <ellipse cx="50" cy="90" rx="35" ry="28" fill="#E0E0E0"/> <circle cx="50" cy="50" r="25" fill="#F0F0F0"/> <ellipse cx="35" cy="20" rx="8" ry="20" fill="#E0E0E0" transform="rotate(-15 35 20)"/> <ellipse cx="65" cy="20" rx="8" ry="20" fill="#E0E0E0" transform="rotate(15 65 20)"/> <ellipse cx="35" cy="22" rx="5" ry="15" fill="#F8C8DC" transform="rotate(-15 35 22)"/> <ellipse cx="65" cy="22" rx="5" ry="15" fill="#F8C8DC" transform="rotate(15 65 22)"/> <circle cx="40" cy="48" r="3" fill="black"/> <circle cx="60" cy="48" r="3" fill="black"/> <path d="M 47 55 Q 50 60 53 55 Z" fill="#FFB6C1"/> <ellipse cx="30" cy="105" rx="10" ry="5" fill="#D0D0D0"/> <ellipse cx="70" cy="105" rx="10" ry="5" fill="#D0D0D0"/> <circle cx="80" cy="100" r="10" fill="white"/> </svg>
             <svg id="giraffe" class="animal" viewBox="0 0 100 180"> <ellipse cx="50" cy="30" rx="20" ry="15" fill="#FFC107"/> <rect x="40" y="40" width="20" height="80" fill="#FFC107"/> <ellipse cx="50" cy="140" rx="40" ry="30" fill="#FFC107"/> <rect x="25" y="160" width="10" height="20" fill="#FFC107"/> <rect x="65" y="160" width="10" height="20" fill="#FFC107"/> <circle cx="50" cy="130" r="5" fill="#8B4513"/> <circle cx="30" cy="145" r="4" fill="#8B4513"/> <circle cx="70" cy="145" r="4" fill="#8B4513"/> <circle cx="45" cy="80" r="3" fill="#8B4513"/> <circle cx="55" cy="60" r="3" fill="#8B4513"/> <circle cx="42" cy="28" r="3" fill="black"/> <circle cx="58" cy="28" r="3" fill="black"/> <rect x="40" y="5" width="5" height="15" fill="#8B4513"/> <rect x="55" y="5" width="5" height="15" fill="#8B4513"/> <circle cx="42.5" cy="5" r="3" fill="#8B4513"/> <circle cx="57.5" cy="5" r="3" fill="#8B4513"/> <path d="M 85 150 Q 95 160 90 170" stroke="#8B4513" stroke-width="2" fill="none"/> </svg>
+            <svg id="elephant" class="animal" viewBox="0 0 150 120"> <ellipse cx="75" cy="70" rx="50" ry="40" fill="silver"/> <ellipse cx="35" cy="50" rx="25" ry="20" fill="#B0B0B0"/> <path d="M15 55 Q 25 80, 5 90 T 10 100 Q 30 105 40 80 Q 30 60 15 55 Z" fill="#A9A9A9"/> <ellipse cx="25" cy="25" rx="15" ry="25" fill="#C0C0C0" transform="rotate(-20 25 25)"/> <ellipse cx="45" cy="25" rx="15" ry="25" fill="#C0C0C0" transform="rotate(20 45 25)"/> <circle cx="30" cy="48" r="3" fill="black"/> <rect x="50" y="105" width="15" height="15" fill="#A9A9A9"/> <rect x="80" y="105" width="15" height="15" fill="#A9A9A9"/> <rect x="30" y="105" width="15" height="15" fill="#A9A9A9"/> <rect x="100" y="105" width="15" height="15" fill="#A9A9A9"/> <path d="M125 70 Q 135 65 130 80" stroke="#A9A9A9" stroke-width="3" fill="none"/> </svg>
             <svg id="carrot" class="food" viewBox="0 0 40 70"> <path d="M 20 70 Q 38 55 39 35 C 40 15 20 0 20 0 S 0 15 1 35 Q 2 55 20 70 Z" fill="orange"/> <ellipse cx="20" cy="60" rx="16" ry="6" fill="#FF8C00" opacity="0.7"/> <path d="M 18 2 L 22 2 L 25 15 L 20 12 L 15 15 Z" fill="#2E8B57"/> <path d="M 20 5 Q 10 10 12 20 Z" fill="#3CB371" transform="rotate(-10 20 5)"/> <path d="M 20 5 Q 30 10 28 20 Z" fill="#3CB371" transform="rotate(10 20 5)"/> </svg>
             <svg id="lettuce" class="food" viewBox="0 0 60 50"> <ellipse cx="30" cy="35" rx="28" ry="15" fill="#90EE90"/> <path d="M 10 35 Q 0 20 15 15 C 25 5 35 5 45 15 Q 60 20 50 35 Z" fill="#3CB371"/> <path d="M 20 30 Q 15 15 30 10 Q 45 15 40 30 Z" fill="#2E8B57"/> <circle cx="30" cy="25" r="10" fill="#98FB98"/> </svg>
+            <svg id="mango" class="food" viewBox="0 0 50 60"> <ellipse cx="25" cy="30" rx="22" ry="28" fill="#FF8C00"/> <ellipse cx="25" cy="30" rx="20" ry="26" fill="#FFA500"/> <path d="M25 5 Q 28 0 32 6 L 25 12 Z" fill="#228B22"/> <ellipse cx="15" cy="20" rx="3" ry="5" fill="rgba(255,255,0,0.3)" transform="rotate(-30 15 20)"/> <ellipse cx="35" cy="40" rx="4" ry="2" fill="rgba(255,69,0,0.2)"/> </svg>
             <div id="celebration-container"></div>
         </div>
     </main>
     <footer> <p>Eleanor's Animal Adventure!</p> </footer>
-
-    <!-- On-Screen Controls -->
-    <div class="control-row" id="middle-controls">
-        <div class="control-button" id="d-pad-up">▲</div>
-        <div class="control-button" id="d-pad-down">▼</div>
-    </div>
-    <div class="control-row" id="bottom-controls">
-        <div class="control-button" id="d-pad-left">◄</div>
-        <div class="control-button" id="d-pad-right">►</div>
-    </div>
-
+    <div class="control-row" id="middle-controls"> <div class="control-button" id="d-pad-up">▲</div> <div class="control-button" id="d-pad-down">▼</div> </div>
+    <div class="control-row" id="bottom-controls"> <div class="control-button" id="d-pad-left">◄</div> <div class="control-button" id="d-pad-right">►</div> </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const playArea = document.getElementById('play-area'); // <<< FIXED: Explicitly get play-area
             const body = document.body;
-            const playArea = document.getElementById('play-area');
             const rabbitEl = document.getElementById('rabbit');
             const giraffeEl = document.getElementById('giraffe');
+            const elephantEl = document.getElementById('elephant');
             const carrotEl = document.getElementById('carrot');
             const lettuceEl = document.getElementById('lettuce');
+            const mangoEl = document.getElementById('mango');
             const celebrationContainer = document.getElementById('celebration-container');
             const scoreDisplay = document.getElementById('score-display');
             const foodNameSpan = document.getElementById('food-name');
             const toggleButton = document.getElementById('toggle-button');
-
             const dPadUp = document.getElementById('d-pad-up');
             const dPadDown = document.getElementById('d-pad-down');
             const dPadLeft = document.getElementById('d-pad-left');
             const dPadRight = document.getElementById('d-pad-right');
 
+            const MODES = { RABBIT: 0, GIRAFFE: 1, ELEPHANT: 2 };
+            const MODE_COUNT = Object.keys(MODES).length;
+            let currentMode = MODES.RABBIT;
             let score = 0;
-            let isGiraffeMode = false;
             let activeAnimal = rabbitEl;
             let activeFood = carrotEl;
             let A_WIDTH, A_HEIGHT, F_WIDTH, F_HEIGHT;
-
             let moveSpeed = 5;
             let animalX, animalY;
             let animalScaleX = 1;
-
             const keysPressed = {};
             let gamepadIndex = null;
             const JOYSTICK_DEADZONE = 0.25;
 
-            function updateActiveAnimalDimensions() {
-                A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width);
-                A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);
-            }
-            function updateActiveFoodDimensions() {
-                F_WIDTH = parseFloat(getComputedStyle(activeFood).width);
-                F_HEIGHT = parseFloat(getComputedStyle(activeFood).height);
-            }
+            function updateActiveAnimalDimensions() { if(activeAnimal) {A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width); A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);} }
+            function updateActiveFoodDimensions() { if(activeFood) {F_WIDTH = parseFloat(getComputedStyle(activeFood).width); F_HEIGHT = parseFloat(getComputedStyle(activeFood).height);} }
 
-            function updateActiveElements() {
-                isGiraffeMode = body.classList.contains('giraffe-mode');
+            function applyModeStylesAndElements() {
+                body.classList.remove('giraffe-mode', 'elephant-mode');
                 const oldAnimal = activeAnimal;
+                const oldFood = activeFood;
 
-                if (isGiraffeMode) {
-                    activeAnimal = giraffeEl; activeFood = lettuceEl;
-                    foodNameSpan.textContent = "Lettuce";
-                    toggleButton.textContent = "Change to Rabbit";
-                } else {
-                    activeAnimal = rabbitEl; activeFood = carrotEl;
-                    foodNameSpan.textContent = "Carrots";
-                    toggleButton.textContent = "Change to Giraffe";
+                switch (currentMode) {
+                    case MODES.RABBIT: activeAnimal = rabbitEl; activeFood = carrotEl; foodNameSpan.textContent = "Carrots"; break;
+                    case MODES.GIRAFFE: body.classList.add('giraffe-mode'); activeAnimal = giraffeEl; activeFood = lettuceEl; foodNameSpan.textContent = "Lettuce"; break;
+                    case MODES.ELEPHANT: body.classList.add('elephant-mode'); activeAnimal = elephantEl; activeFood = mangoEl; foodNameSpan.textContent = "Mangoes"; break;
                 }
-                updateActiveAnimalDimensions();
+                
+                if (activeAnimal) activeAnimal.style.display = 'block'; // Ensure visible before getting dimensions
+                if (activeFood) activeFood.style.display = 'none'; // Hide food initially, spawnNewFood will show it
+
+                updateActiveAnimalDimensions(); 
                 updateActiveFoodDimensions();
 
-                if (oldAnimal !== activeAnimal) {
-                    oldAnimal.style.display = 'none';
-                    activeAnimal.style.display = 'block';
-                }
-                activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
+                if (oldAnimal && oldAnimal !== activeAnimal) oldAnimal.style.display = 'none';
+                if (oldFood && oldFood !== activeFood) oldFood.style.display = 'none';
+                
+                // activeAnimal.style.display = 'block'; already done
+                // activeFood will be positioned and displayed by spawnNewFood
+
+                if (activeAnimal) activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
             }
 
             function initializeGame() {
-                updateActiveElements();
-                const paWidth = playArea.clientWidth;
-                const paHeight = playArea.clientHeight;
-                animalX = (paWidth - A_WIDTH) / 2;
-                animalY = paHeight - A_HEIGHT - (paHeight * 0.05);
-                animalScaleX = 1;
-                [rabbitEl, giraffeEl].forEach(el => {
-                    el.style.left = `${animalX}px`;
-                    el.style.top = `${animalY}px`;
-                    el.style.setProperty('--animal-scaleX', animalScaleX.toString());
-                });
-                updateScore();
-                spawnNewFood();
+                applyModeStylesAndElements();
+                // Ensure playArea is valid and has dimensions before proceeding
+                if (!playArea || playArea.clientWidth === 0 || playArea.clientHeight === 0) {
+                    console.error("Play area not found or has no dimensions. Retrying initialization soon.");
+                    setTimeout(initializeGame, 100); // Retry if dimensions are not ready
+                    return;
+                }
+                updateActiveAnimalDimensions(); // Make sure A_WIDTH/A_HEIGHT are fresh after mode apply and potential display changes
+
+                const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
+                animalX = (paWidth - A_WIDTH) / 2; animalY = paHeight - A_HEIGHT - (paHeight * 0.05); animalScaleX = 1;
+                
+                [rabbitEl, giraffeEl, elephantEl].forEach(el => { if(el) { el.style.left = `${animalX}px`; el.style.top = `${animalY}px`; el.style.setProperty('--animal-scaleX', animalScaleX.toString());}});
+                
+                updateScore(); 
+                spawnNewFood(); 
                 requestAnimationFrame(gameLoop);
             }
 
             function toggleMode() {
-                const oldHeight = A_HEIGHT;
-                body.classList.toggle('giraffe-mode');
-                updateActiveElements();
-                animalY += (oldHeight - A_HEIGHT);
-                const paHeight = playArea.clientHeight;
-                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
-                activeAnimal.style.left = `${animalX}px`;
-                activeAnimal.style.top = `${animalY}px`;
-                activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
+                const oldHeight = A_HEIGHT; 
+                currentMode = (currentMode + 1) % MODE_COUNT; 
+                applyModeStylesAndElements(); // This now correctly updates A_WIDTH, A_HEIGHT for the new animal
+                
+                // Adjust animalY based on the height difference of the old and new animal
+                // to keep its bottom roughly at the same position.
+                animalY += (oldHeight - A_HEIGHT); 
+                
+                const paHeight = playArea.clientHeight; 
+                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT)); // Clamp Y within bounds
+                
+                if(activeAnimal) { 
+                    activeAnimal.style.left = `${animalX}px`; 
+                    activeAnimal.style.top = `${animalY}px`; 
+                    activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
+                }
                 spawnNewFood();
             }
 
             function updateScore() { scoreDisplay.textContent = score; }
-
+            
             function spawnNewFood() {
-                if (isGiraffeMode) {
-                    carrotEl.style.display = 'none'; lettuceEl.style.display = 'block'; activeFood = lettuceEl;
-                } else {
-                    lettuceEl.style.display = 'none'; carrotEl.style.display = 'block'; activeFood = carrotEl;
+                // Call applyModeStylesAndElements to ensure activeFood is correct,
+                // but it might hide it. We need to ensure it's visible after this.
+                // applyModeStylesAndElements(); // This was causing food to hide then re-appear. Not needed here if mode doesn't change.
+                
+                // Ensure current food for the mode is selected and its dimensions are known.
+                // applyModeStylesAndElements already does this, but if called from collectFood,
+                // activeFood might point to the old collected food.
+                // Let's ensure activeFood is the one for the current mode.
+                switch (currentMode) {
+                    case MODES.RABBIT: activeFood = carrotEl; break;
+                    case MODES.GIRAFFE: activeFood = lettuceEl; break;
+                    case MODES.ELEPHANT: activeFood = mangoEl; break;
                 }
-                updateActiveFoodDimensions();
+                updateActiveFoodDimensions(); // Get dimensions for the *correct* food
+
+                if (!activeFood || !playArea || playArea.clientWidth === 0) { // Guard if food or playArea not ready
+                    console.warn("Cannot spawn food: Active food or play area not ready.");
+                    return; 
+                }
+                
+                activeFood.style.display = 'block'; // Make sure the correct food is visible
+
+                if (!F_WIDTH || !F_HEIGHT) { // Guard if food dimensions not ready after display block
+                     console.warn("Cannot spawn food: Food dimensions not ready. Retrying update.");
+                     updateActiveFoodDimensions(); // Try once more
+                     if (!F_WIDTH || !F_HEIGHT) {
+                        console.error("Food dimensions still not ready after retry. Aborting spawn.");
+                        return;
+                     }
+                }
+
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
                 const paddingX = paWidth * 0.05; const paddingY = paHeight * 0.05;
+                
                 const foodX = Math.random() * (paWidth - F_WIDTH - 2 * paddingX) + paddingX;
                 const foodY = Math.random() * (paHeight - F_HEIGHT - 2 * paddingY) + paddingY;
-                activeFood.style.left = `${foodX}px`; activeFood.style.top = `${foodY}px`;
+                
+                activeFood.style.left = `${foodX}px`; 
+                activeFood.style.top = `${foodY}px`;
             }
 
             function checkCollision() {
+                if (!activeAnimal || !activeFood || !A_WIDTH || !F_WIDTH || activeFood.style.display === 'none') return;
                 const rRight = animalX + A_WIDTH; const rBottom = animalY + A_HEIGHT;
                 const fLeft = parseFloat(activeFood.style.left); const fTop = parseFloat(activeFood.style.top);
                 const fRight = fLeft + F_WIDTH; const fBottom = fTop + F_HEIGHT;
-                if (animalX < fRight && rRight > fLeft && animalY < fBottom && rBottom > fTop) {
-                    collectFood();
-                }
+                if (animalX < fRight && rRight > fLeft && animalY < fBottom && rBottom > fTop) collectFood();
             }
 
             function collectFood() {
-                score++; updateScore();
+                score++; updateScore(); 
+                if (!activeFood || !F_WIDTH || !F_HEIGHT) return; // Added F_HEIGHT check
                 const foodCenterX = parseFloat(activeFood.style.left) + F_WIDTH / 2;
                 const foodCenterY = parseFloat(activeFood.style.top) + F_HEIGHT / 2;
-                activeFood.style.display = 'none';
-                if (isGiraffeMode) { playFlags(foodCenterX, foodCenterY); }
-                else { playFireworks(foodCenterX, foodCenterY); }
-                setTimeout(spawnNewFood, isGiraffeMode ? 1200 : 800);
+                
+                activeFood.style.display = 'none'; 
+                let celebrationDelay = 800;
+                switch(currentMode) {
+                    case MODES.RABBIT: playFireworks(foodCenterX, foodCenterY); break;
+                    case MODES.GIRAFFE: playFlags(foodCenterX, foodCenterY); celebrationDelay = 1200; break;
+                    case MODES.ELEPHANT: playWaterSpray(foodCenterX, foodCenterY); celebrationDelay = 1000; break;
+                }
+                setTimeout(spawnNewFood, celebrationDelay);
             }
 
-            function playFireworks(x, y) { const numParticles = 15; const colors = ['#FFD700', '#FFA500', '#FF6347', '#FF4500', '#FFFFFF']; for (let i = 0; i < numParticles; i++) { const particle = document.createElement('div'); particle.classList.add('firework-particle'); particle.style.left = `${x}px`; particle.style.top = `${y}px`; particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; const angle = Math.random() * Math.PI * 2; const distance = 30 + Math.random() * 50; const endRotate = Math.random() * 360 - 180; particle.style.setProperty('--particle-end-x', `calc(-50% + ${Math.cos(angle) * distance}px)`); particle.style.setProperty('--particle-end-y', `calc(-50% + ${Math.sin(angle) * distance}px)`); particle.style.setProperty('--particle-end-rotate', `${endRotate}deg`); celebrationContainer.appendChild(particle); setTimeout(() => particle.remove(), 800); } }
-            function playFlags(x, y) { const numParticles = 8; const flagColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFFF33']; for (let i = 0; i < numParticles; i++) { const particle = document.createElement('div'); particle.classList.add('flag-particle'); particle.style.left = `${x}px`; particle.style.top = `${y}px`; const flagSVG = `<svg viewBox="0 0 20 30" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="0" width="16" height="15" fill="${flagColors[Math.floor(Math.random() * flagColors.length)]}"/><line x1="10" y1="15" x2="10" y2="30" stroke="#A0522D" stroke-width="2"/></svg>`; particle.innerHTML = flagSVG; const angle = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 1.5; const distance = 40 + Math.random() * 70; const endRotate = (Math.random() - 0.5) * 90; const midRotate = (Math.random() - 0.5) * 30; particle.style.setProperty('--particle-mid-x', `${Math.cos(angle) * distance * 0.3}px`); particle.style.setProperty('--particle-mid-y', `${Math.sin(angle) * distance * 0.3}px`); particle.style.setProperty('--particle-mid-rotate', `${midRotate}deg`); particle.style.setProperty('--particle-end-x', `calc(-50% + ${Math.cos(angle) * distance}px)`); particle.style.setProperty('--particle-end-y', `calc(-50% + ${Math.sin(angle) * distance}px)`); particle.style.setProperty('--particle-end-rotate', `${endRotate}deg`); celebrationContainer.appendChild(particle); setTimeout(() => particle.remove(), 1200); } }
+            function playFireworks(x,y){const n=15,c=['#FFD700','#FFA500','#FF6347','#FF4500','#FFFFFF'];for(let i=0;i<n;i++){const p=document.createElement('div');p.classList.add('firework-particle');p.style.left=`${x}px`;p.style.top=`${y}px`;p.style.backgroundColor=c[Math.floor(Math.random()*c.length)];const a=Math.random()*Math.PI*2,d=30+Math.random()*50,r=Math.random()*360-180;p.style.setProperty('--particle-end-x',`calc(-50% + ${Math.cos(a)*d}px)`);p.style.setProperty('--particle-end-y',`calc(-50% + ${Math.sin(a)*d}px)`);p.style.setProperty('--particle-end-rotate',`${r}deg`);celebrationContainer.appendChild(p);setTimeout(()=>p.remove(),800)}}
+            function playFlags(x,y){const n=8,c=['#FF5733','#33FF57','#3357FF','#FF33A1','#FFFF33'];for(let i=0;i<n;i++){const p=document.createElement('div');p.classList.add('flag-particle');p.style.left=`${x}px`;p.style.top=`${y}px`;const svg=`<svg viewBox="0 0 20 30"><rect x="2" y="0" width="16" height="15" fill="${c[Math.floor(Math.random()*c.length)]}"/><line x1="10" y1="15" x2="10" y2="30" stroke="#A0522D" stroke-width="2"/></svg>`;p.innerHTML=svg;const a=(Math.random()-.5)*Math.PI*.8+Math.PI*1.5,d=40+Math.random()*70,r=(Math.random()-.5)*90,mr=(Math.random()-.5)*30;p.style.setProperty('--particle-mid-x',`${Math.cos(a)*d*.3}px`);p.style.setProperty('--particle-mid-y',`${Math.sin(a)*d*.3}px`);p.style.setProperty('--particle-mid-rotate',`${mr}deg`);p.style.setProperty('--particle-end-x',`calc(-50% + ${Math.cos(a)*d}px)`);p.style.setProperty('--particle-end-y',`calc(-50% + ${Math.sin(a)*d}px)`);p.style.setProperty('--particle-end-rotate',`${r}deg`);celebrationContainer.appendChild(p);setTimeout(()=>p.remove(),1200)}}
+            function playWaterSpray(x,y){const n=20;for(let i=0;i<n;i++){const p=document.createElement('div');p.classList.add('water-particle');p.style.left=`${x}px`;p.style.top=`${y}px`;const a=(Math.random()*Math.PI/3)-(Math.PI/6)-(Math.PI/2),d=50+Math.random()*80,ir=(Math.random()*60)-30-45;p.style.setProperty('--initial-spray-rotate',`${ir}deg`);p.style.setProperty('--particle-end-x',`calc(-50% + ${Math.cos(a)*d}px)`);p.style.setProperty('--particle-end-y',`calc(-50% + ${Math.sin(a)*d+(d*.3)}px)`);celebrationContainer.appendChild(p);setTimeout(()=>p.remove(),1000)}}
 
             function gameLoop() {
                 let dx = 0; let dy = 0;
                 if (keysPressed['ArrowUp']) dy -= 1; if (keysPressed['ArrowDown']) dy += 1;
                 if (keysPressed['ArrowLeft']) dx -= 1; if (keysPressed['ArrowRight']) dx += 1;
-                if (gamepadIndex !== null && navigator.getGamepads) {
+
+                if (gamepadIndex !== null && typeof navigator.getGamepads === "function") {
                     const gamepadList = navigator.getGamepads();
                     if (gamepadList && gamepadList[gamepadIndex]) {
                         const gp = gamepadList[gamepadIndex];
-                        if (gp.connected) {
-                            let axisX = gp.axes[0]; let axisY = gp.axes[1];
+                        if (gp && gp.connected) {
+                            const axisX = (gp.axes && gp.axes.length > 0) ? gp.axes[0] : 0;
+                            const axisY = (gp.axes && gp.axes.length > 1) ? gp.axes[1] : 0;
                             if (Math.abs(axisX) > JOYSTICK_DEADZONE) dx += axisX;
                             if (Math.abs(axisY) > JOYSTICK_DEADZONE) dy += axisY;
                         } else { gamepadIndex = null; }
                     } else { gamepadIndex = null; }
                 }
+
                 if (dx !== 0 || dy !== 0) {
                     const magnitude = Math.sqrt(dx * dx + dy * dy);
-                    const normalizedDx = dx / magnitude; const normalizedDy = dy / magnitude;
-                    animalX += normalizedDx * moveSpeed; animalY += normalizedDy * moveSpeed;
+                    // Avoid division by zero if magnitude is somehow zero with non-zero dx/dy (should not happen with current logic)
+                    const normalizedDx = magnitude === 0 ? 0 : dx / magnitude; 
+                    const normalizedDy = magnitude === 0 ? 0 : dy / magnitude;
+                    animalX += normalizedDx * moveSpeed; 
+                    animalY += normalizedDy * moveSpeed;
                     if (normalizedDx < -0.01) animalScaleX = -1;
                     else if (normalizedDx > 0.01) animalScaleX = 1;
                 }
-                updateActiveAnimalDimensions();
+
+                // It's generally better to update dimensions only on resize or mode change,
+                // but if animal size could change dynamically per frame, keep it.
+                // For now, let's assume it's not strictly needed every frame unless sizes change.
+                // updateActiveAnimalDimensions(); // Moved to initialize and mode toggle for efficiency. Re-add if dynamic sizing is needed per frame.
+
+
+                if (!A_WIDTH || !A_HEIGHT || !playArea || playArea.clientWidth === 0) { 
+                     requestAnimationFrame(gameLoop); return;
+                }
+
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
                 animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
                 animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
-                activeAnimal.style.left = `${animalX}px`; activeAnimal.style.top = `${animalY}px`;
-                activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
-                if (activeFood && activeFood.style.display === 'block') { checkCollision(); }
+
+                if(activeAnimal) {
+                    activeAnimal.style.left = `${animalX}px`; activeAnimal.style.top = `${animalY}px`;
+                    activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
+                }
+
+                if (activeFood && activeFood.style.display === 'block') checkCollision();
                 requestAnimationFrame(gameLoop);
             }
 
@@ -343,18 +380,36 @@
             }
             addDPadListener(dPadUp, 'ArrowUp'); addDPadListener(dPadDown, 'ArrowDown');
             addDPadListener(dPadLeft, 'ArrowLeft'); addDPadListener(dPadRight, 'ArrowRight');
-            window.addEventListener('gamepadconnected', (event) => { if (gamepadIndex === null && event.gamepad.axes.length >= 2) gamepadIndex = event.gamepad.index; });
-            window.addEventListener('gamepaddisconnected', (event) => { if (event.gamepad.index === gamepadIndex) gamepadIndex = null; });
+            window.addEventListener('gamepadconnected', (event) => { if (gamepadIndex === null && event.gamepad && event.gamepad.axes && event.gamepad.axes.length >= 2) gamepadIndex = event.gamepad.index; });
+            window.addEventListener('gamepaddisconnected', (event) => { if (event.gamepad && event.gamepad.index === gamepadIndex) gamepadIndex = null; });
             toggleButton.addEventListener('click', toggleMode);
+            
             window.addEventListener('resize', () => {
-                updateActiveAnimalDimensions(); updateActiveFoodDimensions();
+                if (!playArea) return; // Guard
+                updateActiveAnimalDimensions(); 
+                updateActiveFoodDimensions();
+                
                 const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
-                animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
-                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
+                
+                // Recalculate animal position to stay within new bounds, trying to maintain relative position
+                if (A_WIDTH > 0 && A_HEIGHT > 0) { // Avoid division by zero if dimensions are not ready
+                    animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
+                    animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
+                     if(activeAnimal) {
+                        activeAnimal.style.left = `${animalX}px`; 
+                        activeAnimal.style.top = `${animalY}px`;
+                    }
+                }
+
                 if (activeFood && activeFood.style.display === 'block') {
-                    const foodLeft = parseFloat(activeFood.style.left); const foodTop = parseFloat(activeFood.style.top);
-                    if (foodLeft + F_WIDTH > paWidth || foodTop + F_HEIGHT > paHeight || foodLeft < 0 || foodTop < 0) spawnNewFood();
-                } else if (activeFood) { spawnNewFood(); }
+                    const foodLeft = parseFloat(activeFood.style.left); 
+                    const foodTop = parseFloat(activeFood.style.top);
+                    if (!F_WIDTH || !F_HEIGHT || foodLeft + F_WIDTH > paWidth || foodTop + F_HEIGHT > paHeight || foodLeft < 0 || foodTop < 0) {
+                        spawnNewFood();
+                    }
+                } else if (activeFood) { 
+                    spawnNewFood(); 
+                }
             });
             initializeGame();
         });
