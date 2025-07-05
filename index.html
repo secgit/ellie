@@ -53,7 +53,7 @@
         }
         header h1 { margin: 0; font-size: 1.1em; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
         #score-board { font-size: 0.85em; margin-top: 2px; font-weight: bold; }
-        #toggle-button, #dance-button, #enable-motion-button {
+        #toggle-button, #enable-motion-button {
             padding: 5px 10px; font-size: 0.8em; margin-top: 2px; margin-bottom: 2px;
             cursor: pointer; background-color: var(--button-bg); color: var(--text-color-dark);
             border: 1px solid var(--button-border);
@@ -94,19 +94,6 @@
 
         @keyframes subtleHop { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(-3px); } }
         @keyframes subtleSway { 0%, 100% { transform: scaleX(var(--animal-scaleX)) rotate(0deg); } 50% { transform: scaleX(var(--animal-scaleX)) rotate(1.5deg); } 75% { transform: scaleX(var(--animal-scaleX)) rotate(-1.5deg); } }
-        @keyframes dance {
-            0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg); }
-            25% { transform: scaleX(var(--animal-scaleX)) translateY(-10px) rotate(-5deg) scale(1.1); }
-            50% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg) scale(1); }
-            75% { transform: scaleX(var(--animal-scaleX)) translateY(-10px) rotate(5deg) scale(1.1); }
-        }
-
-        body.dance-mode #rabbit,
-        body.dance-mode #giraffe,
-        body.dance-mode #elephant {
-            animation: dance 0.8s infinite ease-in-out;
-        }
-
         @keyframes elephantWalk { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg); } 25% { transform: scaleX(var(--animal-scaleX)) translateY(-2px) rotate(-1deg); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg); } 75% { transform: scaleX(var(--animal-scaleX)) translateY(-2px) rotate(1deg); } }
 
         #celebration-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 20; }
@@ -133,7 +120,6 @@
         <h1>Eleanor's Animal Adventure!</h1>
         <div id="score-board"><span id="food-name">Carrots</span>: <span id="score-display">0</span></div>
         <button id="toggle-button">Change Animal</button>
-        <button id="dance-button">Dance Mode</button>
         <button id="enable-motion-button" style="display: none;">Enable Tilt</button>
     </header>
     <main>
@@ -164,13 +150,11 @@
             const scoreDisplay = document.getElementById('score-display');
             const foodNameSpan = document.getElementById('food-name');
             const toggleButton = document.getElementById('toggle-button');
-            const danceButton = document.getElementById('dance-button');
             // D-pad element variables removed
 
             const MODES = { RABBIT: 0, GIRAFFE: 1, ELEPHANT: 2 };
             const MODE_COUNT = Object.keys(MODES).length;
             let currentMode = MODES.RABBIT;
-            let isDancing = false;
             let score = 0;
             let activeAnimal = rabbitEl;
             let activeFood = carrotEl;
@@ -266,7 +250,7 @@
                     window.addEventListener('deviceorientation', handleOrientation);
                     motionControlsEnabled = true;
                     if(enableMotionButton) enableMotionButton.style.display = 'none';
-n                    console.log("Device orientation supported (no explicit permission needed or already granted).");
+                    console.log("Device orientation supported (no explicit permission needed or already granted).");
                 } else {
                     console.log("Device orientation not supported by this browser.");
                     if(enableMotionButton) {
@@ -464,13 +448,6 @@ n                    console.log("Device orientation supported (no explicit perm
             window.addEventListener('gamepadconnected', (event) => { if (gamepadIndex === null && event.gamepad && event.gamepad.axes && event.gamepad.axes.length >= 2) gamepadIndex = event.gamepad.index; });
             window.addEventListener('gamepaddisconnected', (event) => { if (event.gamepad && event.gamepad.index === gamepadIndex) gamepadIndex = null; });
             toggleButton.addEventListener('click', toggleMode);
-
-            function toggleDanceMode() {
-                isDancing = !isDancing;
-                body.classList.toggle('dance-mode', isDancing);
-                danceButton.textContent = isDancing ? 'Stop Dancing' : 'Dance Mode';
-            }
-            danceButton.addEventListener('click', toggleDanceMode);
             
             window.addEventListener('resize', () => {
                 if (!playArea) return; 
