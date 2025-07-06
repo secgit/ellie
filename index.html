@@ -53,7 +53,7 @@
         }
         header h1 { margin: 0; font-size: 1.1em; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
         #score-board { font-size: 0.85em; margin-top: 2px; font-weight: bold; }
-        #toggle-button, #enable-motion-button {
+        #toggle-button, #enable-motion-button, #dance-toggle {
             padding: 5px 10px; font-size: 0.8em; margin-top: 2px; margin-bottom: 2px;
             cursor: pointer; background-color: var(--button-bg); color: var(--text-color-dark);
             border: 1px solid var(--button-border);
@@ -61,7 +61,8 @@
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         #toggle-button:hover, #toggle-button:active,
-        #enable-motion-button:hover, #enable-motion-button:active { background-color: #E0E0E0; }
+        #enable-motion-button:hover, #enable-motion-button:active,
+        #dance-toggle:hover, #dance-toggle:active { background-color: #E0E0E0; }
         #enable-motion-button { margin-left: 8px; }
         #enable-motion-button:disabled { background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed; }
 
@@ -113,6 +114,18 @@
             box-sizing: border-box; z-index: 100; transition: background-color 0.5s ease;
         }
         /* Removed .control-row and related styles */
+
+        @keyframes whirlwind {
+          0% {
+            transform: scaleX(var(--animal-scaleX, 1)) rotate(0deg) scale(1);
+          }
+          50% {
+            transform: scaleX(var(--animal-scaleX, 1)) rotate(180deg) scale(1.2);
+          }
+          100% {
+            transform: scaleX(var(--animal-scaleX, 1)) rotate(360deg) scale(1);
+          }
+        }
     </style>
 </head>
 <body>
@@ -120,6 +133,7 @@
         <h1>Eleanor's Animal Adventure!</h1>
         <div id="score-board"><span id="food-name">Carrots</span>: <span id="score-display">0</span></div>
         <button id="toggle-button">Change Animal</button>
+        <button id="dance-toggle">Wacky Whirlwind!</button>
         <button id="enable-motion-button" style="display: none;">Enable Tilt</button>
     </header>
     <main>
@@ -448,6 +462,26 @@
             window.addEventListener('gamepadconnected', (event) => { if (gamepadIndex === null && event.gamepad && event.gamepad.axes && event.gamepad.axes.length >= 2) gamepadIndex = event.gamepad.index; });
             window.addEventListener('gamepaddisconnected', (event) => { if (event.gamepad && event.gamepad.index === gamepadIndex) gamepadIndex = null; });
             toggleButton.addEventListener('click', toggleMode);
+
+            const danceToggleButton = document.getElementById('dance-toggle');
+            if (danceToggleButton) {
+                let isDancing = false;
+                danceToggleButton.addEventListener('click', () => {
+                    isDancing = !isDancing;
+                    const animals = document.querySelectorAll('.animal');
+                    if (isDancing) {
+                        danceToggleButton.textContent = 'Stop Dancing!';
+                        animals.forEach(animal => {
+                            animal.style.animation = 'whirlwind 2s infinite linear';
+                        });
+                    } else {
+                        danceToggleButton.textContent = 'Wacky Whirlwind!';
+                        animals.forEach(animal => {
+                            animal.style.animation = ''; // Reverts to stylesheet-defined animation
+                        });
+                    }
+                });
+            }
             
             window.addEventListener('resize', () => {
                 if (!playArea) return; 
