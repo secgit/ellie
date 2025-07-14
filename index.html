@@ -153,7 +153,7 @@
     <!-- D-pad HTML removed -->
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => {
             const playArea = document.getElementById('play-area');
             const body = document.body;
             const rabbitEl = document.getElementById('rabbit');
@@ -263,10 +263,21 @@
                             checkMobileControls("Error enabling tilt controls. Game may be unplayable without keyboard/gamepad.");
                         });
                 } else if (typeof DeviceOrientationEvent !== 'undefined') {
-                    window.addEventListener('deviceorientation', handleOrientation);
-                    motionControlsEnabled = true;
-                    if(enableMotionButton) enableMotionButton.style.display = 'none';
-                    console.log("Device orientation supported (no explicit permission needed or already granted).");
+                    // For Android and other devices that don't require explicit permission
+                    const startMotion = () => {
+                        window.addEventListener('deviceorientation', handleOrientation, { once: true });
+                        // A small delay to see if the event fires.
+                        setTimeout(() => {
+                            if (motionControlsEnabled) return; // Already enabled by a successful event
+                             window.removeEventListener('deviceorientation', handleOrientation);
+                             // Re-add the listener without `once` if the first one was just a check
+                            window.addEventListener('deviceorientation', handleOrientation);
+                            motionControlsEnabled = true;
+                            if(enableMotionButton) enableMotionButton.style.display = 'none';
+                            console.log("Device orientation successfully engaged.");
+                        }, 100);
+                    };
+                    startMotion();
                 } else {
                     console.log("Device orientation not supported by this browser.");
                     if(enableMotionButton) {
