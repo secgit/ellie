@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Princess Castle Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-screen">
+            <div id="game-world">
+                <div id="princess" class="princess"></div>
+                <div id="current-room" class="room"></div>
+                <div id="items-container"></div>
+                <div id="doors-container"></div>
+            </div>
+        </div>
+        
+        <div id="ui-overlay">
+            <button id="back-button" onclick="window.location.href='../index.html'">← Back to Games</button>
+            <div id="score-display">Items Collected: <span id="score">0</span>/10</div>
+            <div id="room-display">Room: <span id="current-room-name">Throne Room</span></div>
+        </div>
+
+        <div id="spelling-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Spell the item!</h2>
+                <img id="item-image" src="" alt="Item">
+                <p id="item-name"></p>
+                <input type="text" id="spelling-input" placeholder="Type the spelling here...">
+                <button id="check-spelling">Check Spelling</button>
+                <button id="skip-item">Skip</button>
+                <p id="spelling-feedback"></p>
+            </div>
+        </div>
+
+        <div id="celebration-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Great job!</h2>
+                <img id="celebration-image" src="" alt="Princess with item">
+                <p id="celebration-text"></p>
+                <button id="continue-game">Continue Adventure</button>
+            </div>
+        </div>
+
+        <div id="victory-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>🏰 Adventure Complete! 🏰</h2>
+                <p>The princess has collected all the treasures!</p>
+                <button id="restart-game">Start New Adventure</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

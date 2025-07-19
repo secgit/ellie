@@ -1,0 +1,281 @@
+body {
+    font-family: 'Nunito', sans-serif;
+    text-align: center;
+    background-color: #f0f8ff;
+    color: #333;
+}
+
+h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3em;
+    color: #ff69b4;
+    text-shadow: 2px 2px 4px #aaa;
+}
+
+#animal-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 6em;
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+#game-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    color: #ff69b4;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+#back-button {
+    padding: 10px 20px;
+    font-size: 0.5em;
+    background-color: #ff69b4;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: bold;
+}
+
+#back-button:hover {
+    background-color: #ff1493;
+}
+
+
+#image-container {
+    margin: 20px auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    justify-items: center;
+    max-width: 800px;
+}
+
+.image-wrapper {
+    position: relative;
+}
+
+img {
+    width: 150px;
+    height: 150px;
+    border: 10px solid #ffb6c1;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 5px 5px 10px #888;
+    touch-action: manipulation;
+}
+
+img:hover {
+    transform: scale(1.1);
+    border-color: #ff69b4;
+}
+
+.text-correct {
+    color: #32cd32 !important;
+    animation: shake 0.5s;
+}
+
+.text-incorrect {
+    color: #ff0000 !important;
+    animation: shake 0.5s;
+}
+
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+
+.sparkle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #ffc700;
+    border-radius: 50%;
+    animation: sparkle-animation 1s forwards;
+}
+
+@keyframes sparkle-animation {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5) translate(var(--x), var(--y));
+        opacity: 0;
+    }
+}
+
+#game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#game-over-box {
+    background-color: #f0f8ff;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    color: #333;
+    border: 10px solid #ff69b4;
+}
+
+#game-over-box h2 {
+    font-size: 3em;
+    color: #ff69b4;
+    margin-bottom: 20px;
+}
+
+#game-over-box p {
+    font-size: 1.5em;
+    margin-bottom: 30px;
+}
+
+#play-again-btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1.5em;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 5px solid #ffb6c1;
+    background-color: #ff69b4;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+#play-again-btn:hover {
+    transform: scale(1.1);
+    border-color: #ff69b4;
+    background-color: #ffb6c1;
+}
+
+@media (max-width: 768px) {
+    body {
+        margin: 0;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 3em;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    #animal-name {
+        font-size: 4em;
+        margin-bottom: 20px;
+        line-height: 1.1;
+    }
+
+    #game-info {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+
+    #image-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        padding: 10px;
+        box-sizing: border-box;
+        max-width: 100vw;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        border-width: 6px;
+        border-radius: 15px;
+    }
+
+    #game-over-box {
+        padding: 30px;
+        margin: 20px;
+    }
+
+    #game-over-box h2 {
+        font-size: 3.5em;
+    }
+
+    #game-over-box p {
+        font-size: 2em;
+    }
+
+    #play-again-btn {
+        font-size: 2em;
+        padding: 15px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+    }
+
+    #animal-name {
+        font-size: 3.5em;
+        margin-bottom: 15px;
+        padding: 0 10px;
+    }
+
+    #game-info {
+        font-size: 2.2em;
+        margin-bottom: 15px;
+    }
+
+    #image-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        padding: 20px;
+        max-width: 90vw;
+        margin: 0 auto;
+    }
+
+    img {
+        border-width: 5px;
+        border-radius: 12px;
+    }
+
+    #game-over-box {
+        padding: 25px;
+        margin: 15px;
+    }
+
+    #game-over-box h2 {
+        font-size: 3em;
+    }
+
+    #game-over-box p {
+        font-size: 1.8em;
+    }
+
+    #play-again-btn {
+        font-size: 1.8em;
+        padding: 12px 25px;
+    }
+}

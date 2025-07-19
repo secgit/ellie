@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Eleanor's Animal Adventure!</title>
+    <style>
+        :root {
+            /* Default (Rabbit Mode) Colors */
+            --bg-color: #87CEEB; /* Sky Blue */
+            --header-bg: #FFB6C1; /* Light Pink */
+            --play-area-bg: #90EE90; /* Light Green */
+            --play-area-border: #6B8E23; /* Darker Green */
+            --footer-bg: #FFB6C1; /* Light Pink */
+            --button-bg: #F0F0F0;
+            --button-border: #D0D0D0;
+            --text-color-light: white;
+            --text-color-dark: #333;
+            /* Removed D-pad specific colors */
+        }
+
+        body.giraffe-mode {
+            --bg-color: #D2691E; /* Chocolate */
+            --header-bg: #DAA520; /* Goldenrod */
+            --play-area-bg: #F0E68C; /* Khaki */
+            --play-area-border: #B8860B; /* DarkGoldenrod */
+            --footer-bg: #DAA520;
+        }
+
+        body.elephant-mode {
+            --bg-color: #D2B48C; /* Tan */
+            --header-bg: #4682B4; /* SteelBlue */
+            --play-area-bg: #98FB98; /* PaleGreen (Lush) */
+            --play-area-border: #2E8B57; /* SeaGreen */
+            --footer-bg: #4682B4;
+        }
+
+
+        html, body {
+            width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background-color 0.5s ease;
+        }
+        body { display: flex; flex-direction: column; align-items: center; }
+        header {
+            background-color: var(--bg-color); color: var(--text-color-light); padding: 3px 10px;
+            text-align: center; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 100; flex-shrink: 0; box-sizing: border-box;
+            transition: background-color 0.5s ease;
+        }
+        header h1 { margin: 0; font-size: 1.1em; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
+        #score-board { font-size: 0.85em; margin-top: 2px; font-weight: bold; }
+        #toggle-button, #enable-motion-button, #dance-toggle, #back-button {
+            padding: 5px 10px; font-size: 0.8em; margin-top: 2px; margin-bottom: 2px;
+            cursor: pointer; background-color: var(--button-bg); color: var(--text-color-dark);
+            border: 1px solid var(--button-border);
+            border-radius: 4px; font-family: inherit;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        #toggle-button:hover, #toggle-button:active,
+        #enable-motion-button:hover, #enable-motion-button:active,
+        #dance-toggle:hover, #dance-toggle:active,
+        #back-button:hover, #back-button:active { background-color: #E0E0E0; }
+        #enable-motion-button { margin-left: 8px; }
+        #enable-motion-button:disabled { background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed; }
+
+
+        main { flex-grow: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
+        #play-area {
+            width: 90%;
+            height: 100%;
+            background-color: #FFFFFF;
+            border: 2px solid #DDDDDD;
+            position: relative; overflow: hidden; box-sizing: border-box;
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+        .animal, .food {
+            position: absolute; display: none;
+            will-change: transform, left, top;
+            transition: opacity 0.1s ease-in-out;
+        }
+        #rabbit { width: clamp(120px, 20vw, 180px); height: auto; z-index: 5; animation: subtleHop 2s infinite ease-in-out; --animal-scaleX: 1; }
+        #giraffe { width: clamp(140px, 22vw, 200px); height: auto; z-index: 5; animation: subtleSway 3s infinite ease-in-out; --animal-scaleX: 1; }
+        #elephant { width: clamp(130px, 21vw, 190px); height: auto; z-index: 5; animation: elephantWalk 2.5s infinite ease-in-out; --animal-scaleX: 1; }
+
+        #carrot { width: clamp(22px, 4.5vw, 35px); height: auto; aspect-ratio: 40 / 70; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
+        #lettuce { width: clamp(28px, 5.5vw, 45px); height: auto; aspect-ratio: 60 / 50; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
+        #mango { width: clamp(25px, 5vw, 40px); height: auto; aspect-ratio: 50 / 60; z-index: 4; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3)); }
+
+        body:not(.giraffe-mode):not(.elephant-mode) #rabbit,
+        body:not(.giraffe-mode):not(.elephant-mode) #carrot { display: block; }
+        body.giraffe-mode #giraffe, body.giraffe-mode #lettuce { display: block; }
+        body.elephant-mode #elephant, body.elephant-mode #mango { display: block; }
+
+        @keyframes subtleHop { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(-3px); } }
+        @keyframes subtleSway { 0%, 100% { transform: scaleX(var(--animal-scaleX)) rotate(0deg); } 50% { transform: scaleX(var(--animal-scaleX)) rotate(1.5deg); } 75% { transform: scaleX(var(--animal-scaleX)) rotate(-1.5deg); } }
+        @keyframes elephantWalk { 0%, 100% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg); } 25% { transform: scaleX(var(--animal-scaleX)) translateY(-2px) rotate(-1deg); } 50% { transform: scaleX(var(--animal-scaleX)) translateY(0px) rotate(0deg); } 75% { transform: scaleX(var(--animal-scaleX)) translateY(-2px) rotate(1deg); } }
+
+        #celebration-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 20; }
+        .firework-particle, .flag-particle, .water-particle { position: absolute; will-change: transform, opacity; }
+        .firework-particle { width: 6px; height: 6px; border-radius: 50%; animation: explodeAnim 0.8s ease-out forwards; }
+        .flag-particle { width: 15px; height: 22px; animation: flagWaveAnim 1.2s ease-out forwards; }
+        .flag-particle svg { width: 100%; height: 100%; display: block; }
+        .water-particle { width: clamp(5px, 1.5vmin, 10px); height: clamp(10px, 3vmin, 20px); background-color: rgba(100, 150, 255, 0.7); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; animation: waterSprayAnim 1s ease-out forwards; }
+
+        @keyframes explodeAnim { 0% { transform: translate(var(--particle-start-x, -50%), var(--particle-start-y, -50%)) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(var(--particle-end-x), var(--particle-end-y)) scale(0.3) rotate(var(--particle-end-rotate, 0deg)); opacity: 0; } }
+        @keyframes flagWaveAnim { 0% { transform: translate(var(--particle-start-x, -50%), var(--particle-start-y, -50%)) scale(1) rotate(0deg); opacity: 1; } 20% { transform: translate(calc(var(--particle-start-x, -50%) + var(--particle-mid-x, 0px)), calc(var(--particle-start-y, -50%) + var(--particle-mid-y, 0px) - 15px)) scale(1.1) rotate(var(--particle-mid-rotate, 0deg)); opacity: 1; } 100% { transform: translate(var(--particle-end-x), var(--particle-end-y)) scale(0.5) rotate(var(--particle-end-rotate, 0deg)); opacity: 0; } }
+        @keyframes waterSprayAnim { 0% { transform: translate(var(--particle-start-x, -50%), var(--particle-start-y, -50%)) scale(1) rotate(var(--initial-spray-rotate, -45deg)); opacity: 1; } 100% { transform: translate(var(--particle-end-x), var(--particle-end-y)) scale(0.2) rotate(var(--initial-spray-rotate, -45deg)); opacity: 0; } }
+
+        footer {
+            background-color: var(--bg-color); color: var(--text-color-light); text-align: center;
+            padding: 2px 0; width: 100%; font-size: 0.65em; flex-shrink: 0;
+            box-sizing: border-box; z-index: 100; transition: background-color 0.5s ease;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.2);
+        }
+        /* Removed .control-row and related styles */
+
+        @keyframes whirlwind {
+          0% {
+            transform: scaleX(var(--animal-scaleX, 1)) rotate(0deg) scale(1);
+          }
+          50% {
+            transform: scaleX(var(--animal-scaleX, 1)) rotate(180deg) scale(1.2);
+          }
+          100% {
+            transform: scaleX(var(--animal-scaleX, 1)) rotate(360deg) scale(1);
+          }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Eleanor's Animal Adventure!</h1>
+        <div id="score-board"><span id="food-name">Carrots</span>: <span id="score-display">0</span></div>
+        <button id="back-button" onclick="window.location.href='../index.html'">← Back to Games</button>
+        <button id="toggle-button">Change Animal</button>
+        <button id="dance-toggle">Wacky Whirlwind!</button>
+        <button id="enable-motion-button" style="display: none;">Enable Tilt</button>
+    </header>
+    <main>
+        <div id="play-area">
+            <img id="rabbit" class="animal" src="rabbit.png" alt="Rabbit">
+            <img id="elephant" class="animal" src="elephant.png" alt="Elephant">
+            <img id="giraffe" class="animal" src="giraffe.png" alt="Giraffe">
+            <svg id="carrot" class="food" viewBox="0 0 40 70"> <path d="M 20 70 Q 38 55 39 35 C 40 15 20 0 20 0 S 0 15 1 35 Q 2 55 20 70 Z" fill="orange"/> <ellipse cx="20" cy="60" rx="16" ry="6" fill="#FF8C00" opacity="0.7"/> <path d="M 18 2 L 22 2 L 25 15 L 20 12 L 15 15 Z" fill="#2E8B57"/> <path d="M 20 5 Q 10 10 12 20 Z" fill="#3CB371" transform="rotate(-10 20 5)"/> <path d="M 20 5 Q 30 10 28 20 Z" fill="#3CB371" transform="rotate(10 20 5)"/> </svg>
+            <svg id="lettuce" class="food" viewBox="0 0 60 50"> <ellipse cx="30" cy="35" rx="28" ry="15" fill="#90EE90"/> <path d="M 10 35 Q 0 20 15 15 C 25 5 35 5 45 15 Q 60 20 50 35 Z" fill="#3CB371"/> <path d="M 20 30 Q 15 15 30 10 Q 45 15 40 30 Z" fill="#2E8B57"/> <circle cx="30" cy="25" r="10" fill="#98FB98"/> </svg>
+            <svg id="mango" class="food" viewBox="0 0 50 60"> <ellipse cx="25" cy="30" rx="22" ry="28" fill="#FF8C00"/> <ellipse cx="25" cy="30" rx="20" ry="26" fill="#FFA500"/> <path d="M25 5 Q 28 0 32 6 L 25 12 Z" fill="#228B22"/> <ellipse cx="15" cy="20" rx="3" ry="5" fill="rgba(255,255,0,0.3)" transform="rotate(-30 15 20)"/> <ellipse cx="35" cy="40" rx="4" ry="2" fill="rgba(255,69,0,0.2)"/> </svg>
+            <div id="celebration-container"></div>
+        </div>
+    </main>
+    <footer> <p>Eleanor's Animal Adventure!</p> </footer>
+
+    <script>
+        window.addEventListener('load', () => {
+            const playArea = document.getElementById('play-area');
+            const body = document.body;
+            const rabbitEl = document.getElementById('rabbit');
+            const giraffeEl = document.getElementById('giraffe');
+            const elephantEl = document.getElementById('elephant');
+            const carrotEl = document.getElementById('carrot');
+            const lettuceEl = document.getElementById('lettuce');
+            const mangoEl = document.getElementById('mango');
+            const celebrationContainer = document.getElementById('celebration-container');
+            const scoreDisplay = document.getElementById('score-display');
+            const foodNameSpan = document.getElementById('food-name');
+            const toggleButton = document.getElementById('toggle-button');
+
+            const MODES = { RABBIT: 0, GIRAFFE: 1, ELEPHANT: 2 };
+            const MODE_COUNT = Object.keys(MODES).length;
+            let currentMode = MODES.RABBIT;
+            let score = 0;
+            let activeAnimal = rabbitEl;
+            let activeFood = carrotEl;
+            let A_WIDTH, A_HEIGHT, F_WIDTH, F_HEIGHT;
+            let moveSpeed = 5;
+            let animalX, animalY;
+            let animalScaleX = 1;
+            const keysPressed = {};
+            let gamepadIndex = null;
+            const JOYSTICK_DEADZONE = 0.25;
+
+            let motionControlsEnabled = false;
+            let currentGyroX = 0;
+            let currentGyroY = 0;
+            const TILT_DEADZONE = 3;
+            const MAX_EFFECTIVE_ANGLE = 30;
+            const MAX_TILT_INPUT = 1.0;
+            let enableMotionButton = document.getElementById('enable-motion-button');
+
+            function handleOrientation(event) {
+                if (!motionControlsEnabled) return;
+                let gamma = event.gamma || 0;
+                let beta = event.beta || 0;
+                let tiltX = 0;
+                if (Math.abs(gamma) > TILT_DEADZONE) {
+                    tiltX = gamma;
+                }
+                let tiltY = 0;
+                if (Math.abs(beta) > TILT_DEADZONE) {
+                    tiltY = beta;
+                }
+                currentGyroX = Math.max(-MAX_TILT_INPUT, Math.min(MAX_TILT_INPUT, tiltX / MAX_EFFECTIVE_ANGLE));
+                currentGyroY = Math.max(-MAX_TILT_INPUT, Math.min(MAX_TILT_INPUT, tiltY / MAX_EFFECTIVE_ANGLE));
+            }
+
+            function checkMobileControls(message) {
+                const isTouchDevice = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+                if (isTouchDevice && !motionControlsEnabled) {
+                    const footerP = document.querySelector('footer p');
+                    if (footerP && !footerP.querySelector('.tilt-notice')) {
+                        const notice = document.createElement('span');
+                        notice.className = 'tilt-notice';
+                        notice.textContent = " " + message;
+                        notice.style.color = "yellow";
+                        notice.style.fontWeight = "bold";
+                        notice.style.fontSize = "0.9em";
+                        footerP.appendChild(notice);
+                    }
+                    console.warn("Tilt control notice:", message);
+                }
+            }
+
+            function requestMotionPermission() {
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('portrait-primary')
+                        .then(() => console.log("Screen locked to portrait."))
+                        .catch(err => console.warn("Screen orientation lock failed:", err));
+                }
+
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(permissionState => {
+                            if (permissionState === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation);
+                                motionControlsEnabled = true;
+                                if(enableMotionButton) enableMotionButton.style.display = 'none';
+                                console.log("Device orientation permission granted.");
+                            } else {
+                                console.log("Device orientation permission denied.");
+                                if(enableMotionButton) enableMotionButton.textContent = "Tilt Denied";
+                                checkMobileControls("Tilt permission denied. Game may be unplayable without keyboard/gamepad.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error requesting device orientation permission:", error);
+                            if(enableMotionButton) {
+                                enableMotionButton.textContent = "Tilt Error";
+                                enableMotionButton.style.display = 'block';
+                            }
+                            checkMobileControls("Error enabling tilt controls. Game may be unplayable without keyboard/gamepad.");
+                        });
+                } else if (typeof DeviceOrientationEvent !== 'undefined') {
+                    const startMotion = () => {
+                        window.addEventListener('deviceorientation', handleOrientation, { once: true });
+                        setTimeout(() => {
+                            if (motionControlsEnabled) return;
+                             window.removeEventListener('deviceorientation', handleOrientation);
+                            window.addEventListener('deviceorientation', handleOrientation);
+                            motionControlsEnabled = true;
+                            if(enableMotionButton) enableMotionButton.style.display = 'none';
+                            console.log("Device orientation successfully engaged.");
+                        }, 100);
+                    };
+                    startMotion();
+                } else {
+                    console.log("Device orientation not supported by this browser.");
+                    if(enableMotionButton) {
+                        enableMotionButton.textContent = "Tilt Not Supported";
+                        enableMotionButton.disabled = true;
+                        enableMotionButton.style.display = 'block';
+                    }
+                    checkMobileControls("Tilt controls not supported by this device/browser. Game may be unplayable without keyboard/gamepad.");
+                }
+            }
+
+            function updateActiveAnimalDimensions() { if(activeAnimal) {A_WIDTH = parseFloat(getComputedStyle(activeAnimal).width); A_HEIGHT = parseFloat(getComputedStyle(activeAnimal).height);} }
+            function updateActiveFoodDimensions() { if(activeFood) {F_WIDTH = parseFloat(getComputedStyle(activeFood).width); F_HEIGHT = parseFloat(getComputedStyle(activeFood).height);} }
+
+            function applyModeStylesAndElements() {
+                body.classList.remove('giraffe-mode', 'elephant-mode');
+                const oldAnimal = activeAnimal;
+                const oldFood = activeFood;
+
+                switch (currentMode) {
+                    case MODES.RABBIT: activeAnimal = rabbitEl; activeFood = carrotEl; foodNameSpan.textContent = "Carrots"; break;
+                    case MODES.GIRAFFE: body.classList.add('giraffe-mode'); activeAnimal = giraffeEl; activeFood = lettuceEl; foodNameSpan.textContent = "Lettuce"; break;
+                    case MODES.ELEPHANT: body.classList.add('elephant-mode'); activeAnimal = elephantEl; activeFood = mangoEl; foodNameSpan.textContent = "Mangoes"; break;
+                }
+                
+                if (activeAnimal) activeAnimal.style.display = 'block';
+                if (activeFood) activeFood.style.display = 'none'; 
+
+                updateActiveAnimalDimensions(); 
+                updateActiveFoodDimensions();
+
+                if (oldAnimal && oldAnimal !== activeAnimal) oldAnimal.style.display = 'none';
+                if (oldFood && oldFood !== activeFood) oldFood.style.display = 'none';
+                
+                if (activeAnimal) activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
+            }
+
+            function initializeGame() {
+                applyModeStylesAndElements();
+                if (!playArea || playArea.clientWidth === 0 || playArea.clientHeight === 0) {
+                    console.error("Play area not found or has no dimensions. Retrying initialization soon.");
+                    setTimeout(initializeGame, 100); 
+                    return;
+                }
+                updateActiveAnimalDimensions();
+
+                const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
+                animalX = (paWidth - A_WIDTH) / 2; animalY = paHeight - A_HEIGHT - (paHeight * 0.05); animalScaleX = 1;
+                
+                [rabbitEl, giraffeEl, elephantEl].forEach(el => { if(el) { el.style.left = `${animalX}px`; el.style.top = `${animalY}px`; el.style.setProperty('--animal-scaleX', animalScaleX.toString());}});
+                
+                updateScore(); 
+                spawnNewFood(); 
+                requestAnimationFrame(gameLoop);
+            }
+
+            function toggleMode() {
+                const oldHeight = A_HEIGHT; 
+                currentMode = (currentMode + 1) % MODE_COUNT; 
+                applyModeStylesAndElements(); 
+                animalY += (oldHeight - A_HEIGHT); 
+                const paHeight = playArea.clientHeight; 
+                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
+                
+                if(activeAnimal) { 
+                    activeAnimal.style.left = `${animalX}px`; 
+                    activeAnimal.style.top = `${animalY}px`; 
+                    activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
+                }
+                spawnNewFood();
+            }
+
+            function updateScore() { scoreDisplay.textContent = score; }
+            
+            function spawnNewFood() {
+                switch (currentMode) {
+                    case MODES.RABBIT: activeFood = carrotEl; break;
+                    case MODES.GIRAFFE: activeFood = lettuceEl; break;
+                    case MODES.ELEPHANT: activeFood = mangoEl; break;
+                }
+                updateActiveFoodDimensions();
+
+                if (!activeFood || !playArea || playArea.clientWidth === 0) { 
+                    console.warn("Cannot spawn food: Active food or play area not ready.");
+                    return; 
+                }
+                activeFood.style.display = 'block';
+                if (!F_WIDTH || !F_HEIGHT) {
+                     console.warn("Cannot spawn food: Food dimensions not ready. Retrying update.");
+                     updateActiveFoodDimensions(); 
+                     if (!F_WIDTH || !F_HEIGHT) {
+                        console.error("Food dimensions still not ready after retry. Aborting spawn.");
+                        return;
+                     }
+                }
+
+                const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
+                const paddingX = paWidth * 0.05; const paddingY = paHeight * 0.05;
+                const foodX = Math.random() * (paWidth - F_WIDTH - 2 * paddingX) + paddingX;
+                const foodY = Math.random() * (paHeight - F_HEIGHT - 2 * paddingY) + paddingY;
+                activeFood.style.left = `${foodX}px`; 
+                activeFood.style.top = `${foodY}px`;
+            }
+
+            function checkCollision() {
+                if (!activeAnimal || !activeFood || !A_WIDTH || !F_WIDTH || activeFood.style.display === 'none') return;
+                const rRight = animalX + A_WIDTH; const rBottom = animalY + A_HEIGHT;
+                const fLeft = parseFloat(activeFood.style.left); const fTop = parseFloat(activeFood.style.top);
+                const fRight = fLeft + F_WIDTH; const fBottom = fTop + F_HEIGHT;
+                if (animalX < fRight && rRight > fLeft && animalY < fBottom && rBottom > fTop) collectFood();
+            }
+
+            function collectFood() {
+                score++; updateScore(); 
+                if (!activeFood || !F_WIDTH || !F_HEIGHT) return;
+                const foodCenterX = parseFloat(activeFood.style.left) + F_WIDTH / 2;
+                const foodCenterY = parseFloat(activeFood.style.top) + F_HEIGHT / 2;
+                activeFood.style.display = 'none'; 
+                let celebrationDelay = 800;
+                switch(currentMode) {
+                    case MODES.RABBIT: playFireworks(foodCenterX, foodCenterY); break;
+                    case MODES.GIRAFFE: playFlags(foodCenterX, foodCenterY); celebrationDelay = 1200; break;
+                    case MODES.ELEPHANT: playWaterSpray(foodCenterX, foodCenterY); celebrationDelay = 1000; break;
+                }
+                setTimeout(spawnNewFood, celebrationDelay);
+            }
+
+            function playFireworks(x,y){const n=15,c=['#FFD700','#FFA500','#FF6347','#FF4500','#FFFFFF'];for(let i=0;i<n;i++){const p=document.createElement('div');p.classList.add('firework-particle');p.style.left=`${x}px`;p.style.top=`${y}px`;p.style.backgroundColor=c[Math.floor(Math.random()*c.length)];const a=Math.random()*Math.PI*2,d=30+Math.random()*50,r=Math.random()*360-180;p.style.setProperty('--particle-end-x',`calc(-50% + ${Math.cos(a)*d}px)`);p.style.setProperty('--particle-end-y',`calc(-50% + ${Math.sin(a)*d}px)`);p.style.setProperty('--particle-end-rotate',`${r}deg`);celebrationContainer.appendChild(p);setTimeout(()=>p.remove(),800)}}
+            function playFlags(x,y){const n=8,c=['#FF5733','#33FF57','#3357FF','#FF33A1','#FFFF33'];for(let i=0;i<n;i++){const p=document.createElement('div');p.classList.add('flag-particle');p.style.left=`${x}px`;p.style.top=`${y}px`;const svg=`<svg viewBox="0 0 20 30"><rect x="2" y="0" width="16" height="15" fill="${c[Math.floor(Math.random()*c.length)]}"/><line x1="10" y1="15" x2="10" y2="30" stroke="#A0522D" stroke-width="2"/></svg>`;p.innerHTML=svg;const a=(Math.random()-.5)*Math.PI*.8+Math.PI*1.5,d=40+Math.random()*70,r=(Math.random()-.5)*90,mr=(Math.random()-.5)*30;p.style.setProperty('--particle-mid-x',`${Math.cos(a)*d*.3}px`);p.style.setProperty('--particle-mid-y',`${Math.sin(a)*d*.3}px`);p.style.setProperty('--particle-mid-rotate',`${mr}deg`);p.style.setProperty('--particle-end-x',`calc(-50% + ${Math.cos(a)*d}px)`);p.style.setProperty('--particle-end-y',`calc(-50% + ${Math.sin(a)*d}px)`);p.style.setProperty('--particle-end-rotate',`${r}deg`);celebrationContainer.appendChild(p);setTimeout(()=>p.remove(),1200)}}
+            function playWaterSpray(x,y){const n=20;for(let i=0;i<n;i++){const p=document.createElement('div');p.classList.add('water-particle');p.style.left=`${x}px`;p.style.top=`${y}px`;const a=(Math.random()*Math.PI/3)-(Math.PI/6)-(Math.PI/2),d=50+Math.random()*80,ir=(Math.random()*60)-30-45;p.style.setProperty('--initial-spray-rotate',`${ir}deg`);p.style.setProperty('--particle-end-x',`calc(-50% + ${Math.cos(a)*d}px)`);p.style.setProperty('--particle-end-y',`calc(-50% + ${Math.sin(a)*d+(d*.3)}px)`);celebrationContainer.appendChild(p);setTimeout(()=>p.remove(),1000)}}
+
+            function gameLoop() {
+                let dx = 0; let dy = 0;
+
+                if (keysPressed['ArrowUp']) dy -= 1; 
+                if (keysPressed['ArrowDown']) dy += 1;
+                if (keysPressed['ArrowLeft']) dx -= 1; 
+                if (keysPressed['ArrowRight']) dx += 1;
+
+                if (gamepadIndex !== null && typeof navigator.getGamepads === "function") {
+                    const gamepadList = navigator.getGamepads();
+                    if (gamepadList && gamepadList[gamepadIndex]) {
+                        const gp = gamepadList[gamepadIndex];
+                        if (gp && gp.connected) {
+                            const axisX = (gp.axes && gp.axes.length > 0) ? gp.axes[0] : 0;
+                            const axisY = (gp.axes && gp.axes.length > 1) ? gp.axes[1] : 0;
+                            if (Math.abs(axisX) > JOYSTICK_DEADZONE) dx += axisX;
+                            if (Math.abs(axisY) > JOYSTICK_DEADZONE) dy += axisY;
+                        } else { gamepadIndex = null; }
+                    } else { gamepadIndex = null; }
+                }
+
+                if (motionControlsEnabled) {
+                    dx += currentGyroX;
+                    dy += currentGyroY;
+                }
+
+                if (dx !== 0 || dy !== 0) {
+                    const magnitude = Math.sqrt(dx * dx + dy * dy);
+                    const normalizedDx = magnitude === 0 ? 0 : dx / magnitude; 
+                    const normalizedDy = magnitude === 0 ? 0 : dy / magnitude;
+                    animalX += normalizedDx * moveSpeed; 
+                    animalY += normalizedDy * moveSpeed;
+                    if (normalizedDx < -0.01) animalScaleX = -1;
+                    else if (normalizedDx > 0.01) animalScaleX = 1;
+                }
+
+                if (!A_WIDTH || !A_HEIGHT || !playArea || playArea.clientWidth === 0) { 
+                     requestAnimationFrame(gameLoop); return;
+                }
+
+                const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
+                animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
+                animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
+
+                if(activeAnimal) {
+                    activeAnimal.style.left = `${animalX}px`; activeAnimal.style.top = `${animalY}px`;
+                    activeAnimal.style.setProperty('--animal-scaleX', animalScaleX.toString());
+                }
+
+                if (activeFood && activeFood.style.display === 'block') checkCollision();
+                requestAnimationFrame(gameLoop);
+            }
+
+            document.addEventListener('keydown', (event) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); keysPressed[event.key] = true; } });
+            document.addEventListener('keyup', (event) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); keysPressed[event.key] = false; } });
+            
+            window.addEventListener('gamepadconnected', (event) => { if (gamepadIndex === null && event.gamepad && event.gamepad.axes && event.gamepad.axes.length >= 2) gamepadIndex = event.gamepad.index; });
+            window.addEventListener('gamepaddisconnected', (event) => { if (event.gamepad && event.gamepad.index === gamepadIndex) gamepadIndex = null; });
+            toggleButton.addEventListener('click', toggleMode);
+
+            const danceToggleButton = document.getElementById('dance-toggle');
+            if (danceToggleButton) {
+                let isDancing = false;
+                danceToggleButton.addEventListener('click', () => {
+                    isDancing = !isDancing;
+                    const animals = document.querySelectorAll('.animal');
+                    if (isDancing) {
+                        danceToggleButton.textContent = 'Stop Dancing!';
+                        animals.forEach(animal => {
+                            animal.style.animation = 'whirlwind 2s infinite linear';
+                        });
+                    } else {
+                        danceToggleButton.textContent = 'Wacky Whirlwind!';
+                        animals.forEach(animal => {
+                            animal.style.animation = '';
+                        });
+                    }
+                });
+            }
+            
+            window.addEventListener('resize', () => {
+                if (!playArea) return; 
+                updateActiveAnimalDimensions(); 
+                updateActiveFoodDimensions();
+                
+                const paWidth = playArea.clientWidth; const paHeight = playArea.clientHeight;
+                if (A_WIDTH > 0 && A_HEIGHT > 0) {
+                    animalX = Math.max(0, Math.min(animalX, paWidth - A_WIDTH));
+                    animalY = Math.max(0, Math.min(animalY, paHeight - A_HEIGHT));
+                     if(activeAnimal) {
+                        activeAnimal.style.left = `${animalX}px`; 
+                        activeAnimal.style.top = `${animalY}px`;
+                    }
+                }
+                if (activeFood && activeFood.style.display === 'block') {
+                    const foodLeft = parseFloat(activeFood.style.left); 
+                    const foodTop = parseFloat(activeFood.style.top);
+                    if (!F_WIDTH || !F_HEIGHT || foodLeft + F_WIDTH > paWidth || foodTop + F_HEIGHT > paHeight || foodLeft < 0 || foodTop < 0) {
+                        spawnNewFood();
+                    }
+                } else if (activeFood) { 
+                    spawnNewFood(); 
+                }
+            });
+
+            if (typeof DeviceOrientationEvent !== 'undefined') {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    if(enableMotionButton) {
+                        enableMotionButton.style.display = 'inline-block';
+                        enableMotionButton.addEventListener('click', requestMotionPermission);
+                    }
+                } else {
+                    requestMotionPermission(); 
+                }
+            } else {
+                 if(enableMotionButton) {
+                    enableMotionButton.style.display = 'inline-block';
+                    enableMotionButton.textContent = "Tilt N/A";
+                    enableMotionButton.disabled = true;
+                 }
+                 checkMobileControls("Tilt controls are not supported on this device/browser.");
+            }
+
+            initializeGame();
+        });
+    </script>
+</body>
+</html>

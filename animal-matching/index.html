@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Matching Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>Find the Animal!</h1>
+    <div id="game-info">
+        <button id="back-button" onclick="window.location.href='../index.html'">← Back to Games</button>
+        <div id="score">Score: 0</div>
+    </div>
+    <h2 id="animal-name"></h2>
+    <div id="image-container"></div>
+
+    <div id="game-over-overlay">
+        <div id="game-over-box">
+            <h2>Game Over!</h2>
+            <p>Your final score is: <span id="final-score">0</span></p>
+            <button id="play-again-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
