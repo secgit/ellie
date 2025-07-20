@@ -1,4 +1,5 @@
 venv/*
+.venv/*
 prompts/*
 GEMINI.md
 AGENTS.md
