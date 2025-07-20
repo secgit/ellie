@@ -1,3 +1,5 @@
 venv/*
-prompts.txt
+prompts/*
 GEMINI.md
+AGENTS.md
+CLAUDE.md
