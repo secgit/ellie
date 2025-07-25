@@ -114,6 +114,9 @@ class PrincessCoffeeShop {
             }
         });
 
+        // Touch controls for mobile
+        this.addTouchControls();
+        
         // Resize handler
         window.addEventListener('resize', () => this.handleResize());
         
@@ -131,6 +134,79 @@ class PrincessCoffeeShop {
                 console.log('Gamepad disconnected');
             }
         });
+    }
+
+    addTouchControls() {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        let isTouching = false;
+        
+        // Touch start event
+        this.playArea.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            isTouching = true;
+        }, { passive: false });
+        
+        // Touch move event for continuous movement
+        this.playArea.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isTouching) return;
+            
+            const touch = e.touches[0];
+            touchEndX = touch.clientX;
+            touchEndY = touch.clientY;
+            
+            // Calculate direction based on touch movement
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            const minSwipeDistance = 10; // Minimum distance for movement
+            
+            if (Math.abs(deltaX) > minSwipeDistance || Math.abs(deltaY) > minSwipeDistance) {
+                // Reset keys first
+                this.keysPressed = {};
+                
+                // Set movement keys based on touch direction
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // Horizontal movement is dominant
+                    if (deltaX > minSwipeDistance) {
+                        this.keysPressed['ArrowRight'] = true;
+                    } else if (deltaX < -minSwipeDistance) {
+                        this.keysPressed['ArrowLeft'] = true;
+                    }
+                } else {
+                    // Vertical movement is dominant
+                    if (deltaY > minSwipeDistance) {
+                        this.keysPressed['ArrowDown'] = true;
+                    } else if (deltaY < -minSwipeDistance) {
+                        this.keysPressed['ArrowUp'] = true;
+                    }
+                }
+                
+                // Update touch start position for continuous movement
+                touchStartX = touchEndX;
+                touchStartY = touchEndY;
+            }
+        }, { passive: false });
+        
+        // Touch end event
+        this.playArea.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isTouching = false;
+            // Clear all movement keys when touch ends
+            this.keysPressed = {};
+        }, { passive: false });
+        
+        // Handle touch cancel
+        this.playArea.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            isTouching = false;
+            this.keysPressed = {};
+        }, { passive: false });
     }
 
     setupMotionControls() {
@@ -367,21 +443,72 @@ class PrincessCoffeeShop {
         
         const paWidth = this.playArea.clientWidth;
         const paHeight = this.playArea.clientHeight;
+        const isMobile = window.innerWidth <= 768;
         
-        // Define station positions and sizes
-        const stations = {
-            coffee: { x: 30, y: paHeight * 0.15 - 100, width: 200, height: 200 },
-            cupcake: { x: 30, y: paHeight * 0.5 - 100, width: 200, height: 200 },
-            donut: { x: 30, y: paHeight * 0.85 - 100, width: 200, height: 200 }
-        };
+        let stations;
+        let customerArea;
+        
+        if (isMobile) {
+            // Mobile horizontal layout - stations at top, delivery at bottom-right
+            const stationWidth = window.innerWidth <= 320 ? 75 : (window.innerWidth <= 480 ? 85 : 100);
+            const stationHeight = window.innerWidth <= 320 ? 60 : (window.innerWidth <= 480 ? 70 : 80);
+            const stationY = window.innerWidth <= 320 ? 5 : (window.innerWidth <= 480 ? 8 : 10);
+            
+            stations = {
+                coffee: { 
+                    x: window.innerWidth <= 320 ? 3 : (window.innerWidth <= 480 ? 8 : 10), 
+                    y: stationY, 
+                    width: stationWidth, 
+                    height: stationHeight 
+                },
+                cupcake: { 
+                    x: paWidth / 2 - stationWidth / 2, 
+                    y: stationY, 
+                    width: stationWidth, 
+                    height: stationHeight 
+                },
+                donut: { 
+                    x: paWidth - stationWidth - (window.innerWidth <= 320 ? 3 : (window.innerWidth <= 480 ? 8 : 10)), 
+                    y: stationY, 
+                    width: stationWidth, 
+                    height: stationHeight 
+                }
+            };
+            
+            // Customer area at bottom-right
+            const customerWidth = window.innerWidth <= 320 ? 85 : (window.innerWidth <= 480 ? 100 : 130);
+            const customerHeight = window.innerWidth <= 320 ? 80 : (window.innerWidth <= 480 ? 90 : 100);
+            const customerOffset = window.innerWidth <= 320 ? 5 : (window.innerWidth <= 480 ? 8 : 10);
+            
+            customerArea = {
+                x: paWidth - customerWidth - customerOffset,
+                y: paHeight - customerHeight - customerOffset,
+                width: customerWidth,
+                height: customerHeight
+            };
+        } else {
+            // Desktop vertical layout - original positions
+            stations = {
+                coffee: { x: 30, y: 10, width: 200, height: 200 },
+                cupcake: { x: 30, y: paHeight * 0.5 - 100, width: 200, height: 200 },
+                donut: { x: 30, y: paHeight - 210, width: 200, height: 200 }
+            };
+            
+            customerArea = {
+                x: paWidth - 250,
+                y: paHeight / 2 - 100,
+                width: 220,
+                height: 200
+            };
+        }
         
         // Check each station
         for (const [stationType, station] of Object.entries(stations)) {
             const atStation = (
-                this.princessX < station.x + station.width + 40 &&
-                this.princessX + this.P_WIDTH > station.x - 40 &&
-                this.princessY < station.y + station.height + 40 &&
-                this.princessY + this.P_HEIGHT > station.y - 40
+                this.princessX < station.x + station.width + 20 &&
+                this.princessX + this.P_WIDTH > station.x - 20 &&
+                this.princessY < station.y + station.height + 20 &&
+                this.princessY + this.P_HEIGHT > station.y - 20
             );
             
             if (atStation && !this.isAtStation[stationType]) {
@@ -393,17 +520,12 @@ class PrincessCoffeeShop {
             }
         }
         
-        // Check if at customer area (right side)
-        const customerX = paWidth - 250;
-        const customerY = paHeight / 2 - 100;
-        const customerWidth = 220;
-        const customerHeight = 200;
-        
+        // Check if at customer area
         const atCustomer = (
-            this.princessX < customerX + customerWidth + 40 &&
-            this.princessX + this.P_WIDTH > customerX - 40 &&
-            this.princessY < customerY + customerHeight + 40 &&
-            this.princessY + this.P_HEIGHT > customerY - 40
+            this.princessX < customerArea.x + customerArea.width + 20 &&
+            this.princessX + this.P_WIDTH > customerArea.x - 20 &&
+            this.princessY < customerArea.y + customerArea.height + 20 &&
+            this.princessY + this.P_HEIGHT > customerArea.y - 20
         );
         
         if (atCustomer && !this.isAtCustomer) {

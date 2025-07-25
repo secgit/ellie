@@ -96,45 +96,24 @@ main {
     box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
-#order-display {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    border: 3px solid #ff6b6b;
-    border-radius: 15px;
-    padding: 10px 20px;
-    text-align: center;
-    z-index: 10;
-    min-width: 250px;
-}
-
-#order-display h3 {
-    color: #ff6b6b;
-    margin-bottom: 12px;
-    font-size: 1.6em;
-    font-weight: 600;
-}
-
 #order-items {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     margin: 8px 0;
     flex-wrap: wrap;
 }
 
 .order-item {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    border: 3px solid #ff6b6b;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid #ff6b6b;
     background: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: 3px;
 }
 
 .order-item img {
@@ -144,14 +123,15 @@ main {
 }
 
 #order-count {
-    font-size: 1.4em;
+    font-size: 1.1em;
     font-weight: 600;
     color: #333;
+    margin-top: 6px;
 }
 
 #items-needed {
     color: #ff6b6b;
-    font-size: 1.8em;
+    font-size: 1.3em;
     font-weight: 700;
 }
 
@@ -200,7 +180,7 @@ main {
 
 #coffee-station {
     left: 30px;
-    top: 15%;
+    top: 10px;
 }
 
 #cupcake-station {
@@ -213,35 +193,34 @@ main {
 
 #donut-station {
     left: 30px;
-    bottom: 15%;
+    bottom: 10px;
     background: rgba(255, 193, 7, 0.95);
     border-color: #ffc107;
 }
 
-.station h4 {
-    color: white;
-    margin-bottom: 15px;
-    font-size: 1.4em;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
 
 .station-items {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    margin: 15px 0;
+    align-items: center;
+    height: 100%;
+    padding: 10px;
 }
 
 .station-item {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    border: 3px solid white;
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    border: 4px solid white;
     background: rgba(255, 255, 255, 0.95);
-    padding: 6px;
+    padding: 8px;
     object-fit: contain;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
+
+.station-item:hover {
+    transform: scale(1.05);
 }
 
 .floating-inventory {
@@ -474,11 +453,16 @@ main {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
     padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.delivery-title {
     font-weight: 700;
     color: #ff6b6b;
     font-size: 1.3em;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    margin-bottom: 8px;
 }
 
 #customer-speech {
@@ -587,30 +571,448 @@ footer {
     color: #ff6b6b;
 }
 
+/* Mobile Responsive Design */
 @media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+    
+    header {
+        padding: 6px 10px;
+    }
+    
     header h1 {
+        font-size: 1.4em;
+    }
+    
+    #score-board {
+        font-size: 1em;
+        margin-top: 4px;
+    }
+    
+    #back-button, #enable-motion-button {
+        padding: 8px 12px;
+        font-size: 0.9em;
+        margin: 3px;
+    }
+    
+    #play-area {
+        width: 98%;
+        height: 92%;
+    }
+    
+    .order-item {
+        width: 35px;
+        height: 35px;
+        border-width: 2px;
+    }
+    
+    #order-count {
+        font-size: 1em;
+    }
+    
+    #items-needed {
+        font-size: 1.2em;
+    }
+    
+    .delivery-title {
         font-size: 1.1em;
+        margin-bottom: 6px;
+    }
+    
+    .station {
+        width: 100px;
+        padding: 8px;
+        top: 8px;
+    }
+    
+    #coffee-station {
+        left: 10px;
+        top: 10px;
+    }
+    
+    #cupcake-station {
+        left: 50%;
+        top: 10px;
+        transform: translateX(-50%);
+    }
+    
+    #donut-station {
+        right: 10px;
+        left: auto;
+        top: 10px;
+        bottom: auto;
+    }
+    
+    .station-item {
+        width: 50px;
+        height: 50px;
+        border-width: 3px;
+        padding: 6px;
+    }
+    
+    .progress-circle {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .progress-text {
+        font-size: 0.8em;
+    }
+    
+    #customer-area {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        top: auto;
+        transform: none;
+        width: 130px;
+        padding: 8px;
+    }
+    
+    #current-customer {
+        width: 60px;
+        margin-bottom: 8px;
+    }
+    
+    #delivery-zone {
+        padding: 6px;
+        margin-bottom: 6px;
+    }
+    
+    #customer-speech {
+        font-size: 0.8em;
+        padding: 6px;
+    }
+    
+    .delivery-title {
+        font-size: 0.9em;
+        margin-bottom: 4px;
+    }
+    
+    .character {
+        width: clamp(80px, 20vw, 120px);
+    }
+    
+    .floating-inventory {
+        min-width: 150px;
+        padding: 8px;
+    }
+    
+    .inventory-item img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .inventory-count {
+        width: 18px;
+        height: 18px;
+        font-size: 0.8em;
+        top: -6px;
+        right: -6px;
+    }
+    
+    footer {
+        padding: 8px 0;
+        font-size: 0.85em;
+    }
+    
+    .modal-content {
+        width: 90%;
+        margin: 10% auto;
+        padding: 20px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+    
+    .modal-content p {
+        font-size: 1.1rem;
+        margin: 10px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 12px;
+    }
+    
+    header {
+        padding: 4px 8px;
+    }
+    
+    header h1 {
+        font-size: 1.2em;
+    }
+    
+    #score-board {
+        font-size: 0.9em;
+    }
+    
+    #back-button, #enable-motion-button {
+        padding: 6px 10px;
+        font-size: 0.8em;
+        margin: 2px;
+    }
+    
+    #play-area {
+        width: 99%;
+        height: 90%;
+        border-width: 2px;
+    }
+    
+    .order-item {
+        width: 30px;
+        height: 30px;
+        border-width: 1px;
+    }
+    
+    #order-count {
+        font-size: 0.9em;
+    }
+    
+    #items-needed {
+        font-size: 1.1em;
+    }
+    
+    .delivery-title {
+        font-size: 1em;
+        margin-bottom: 4px;
+    }
+    
+    .station {
+        width: 85px;
+        padding: 6px;
+        border-width: 2px;
+        top: 5px;
+    }
+    
+    #coffee-station {
+        left: 8px;
+        top: 8px;
+    }
+    
+    #cupcake-station {
+        left: 50%;
+        top: 8px;
+        transform: translateX(-50%);
+    }
+    
+    #donut-station {
+        right: 8px;
+        left: auto;
+        top: 8px;
+        bottom: auto;
+    }
+    
+    .station-item {
+        width: 40px;
+        height: 40px;
+        border-width: 2px;
+        padding: 4px;
+    }
+    
+    .progress-circle {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .progress-text {
+        font-size: 0.7em;
+    }
+    
+    #customer-area {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        top: auto;
+        transform: none;
+        width: 100px;
+        padding: 6px;
+        border-width: 2px;
+    }
+    
+    #current-customer {
+        width: 45px;
+        margin-bottom: 6px;
+    }
+    
+    #delivery-zone {
+        padding: 4px;
+        margin-bottom: 4px;
+    }
+    
+    #customer-speech {
+        font-size: 0.7em;
+        padding: 4px;
+    }
+    
+    .delivery-title {
+        font-size: 0.8em;
+        margin-bottom: 3px;
+    }
+    
+    .character {
+        width: clamp(60px, 18vw, 100px);
+    }
+    
+    .floating-inventory {
+        min-width: 120px;
+        padding: 6px;
+        border-width: 2px;
+    }
+    
+    .inventory-title {
+        font-size: 0.9em;
+        margin-bottom: 6px;
+    }
+    
+    .inventory-item img {
+        width: 25px;
+        height: 25px;
+        border-width: 1px;
+    }
+    
+    .inventory-count {
+        width: 16px;
+        height: 16px;
+        font-size: 0.7em;
+        top: -5px;
+        right: -5px;
+    }
+    
+    footer {
+        padding: 6px 0;
+        font-size: 0.75em;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 15px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+    }
+    
+    .modal-content p {
+        font-size: 1rem;
+        margin: 8px 0;
+    }
+    
+    .close {
+        font-size: 24px;
+        right: 10px;
+        top: 10px;
+    }
+}
+
+@media (max-width: 320px) {
+    header h1 {
+        font-size: 1em;
     }
     
     #score-board {
         font-size: 0.8em;
     }
     
-    #order-display {
-        min-width: 200px;
-        padding: 8px 15px;
+    .order-item {
+        width: 25px;
+        height: 25px;
+        border-width: 1px;
     }
     
-    #coffee-station, #customer-area {
-        width: 140px;
-        padding: 12px;
+    .delivery-title {
+        font-size: 0.9em;
     }
     
-    .character {
-        width: clamp(60px, 15vw, 100px);
+    .station {
+        width: 75px;
+        padding: 4px;
+        border-width: 2px;
+        top: 3px;
+    }
+    
+    #coffee-station {
+        left: 3px;
+    }
+    
+    #cupcake-station {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    #donut-station {
+        right: 3px;
+        left: auto;
+    }
+    
+    .station-item {
+        width: 35px;
+        height: 35px;
+        border-width: 2px;
+        padding: 3px;
+    }
+    
+    .progress-circle {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .progress-text {
+        font-size: 0.6em;
+    }
+    
+    #customer-area {
+        right: 3px;
+        bottom: 3px;
+        top: auto;
+        width: 85px;
+        padding: 4px;
+        border-width: 2px;
     }
     
     #current-customer {
-        width: 60px;
+        width: 35px;
+        margin-bottom: 4px;
+    }
+    
+    #delivery-zone {
+        padding: 3px;
+        margin-bottom: 3px;
+    }
+    
+    #customer-speech {
+        font-size: 0.6em;
+        padding: 3px;
+    }
+    
+    .delivery-title {
+        font-size: 0.7em;
+        margin-bottom: 2px;
+    }
+    
+    .character {
+        width: clamp(50px, 16vw, 80px);
+    }
+    
+    .floating-inventory {
+        min-width: 100px;
+        padding: 4px;
+    }
+    
+    .inventory-item img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .inventory-count {
+        width: 14px;
+        height: 14px;
+        font-size: 0.6em;
     }
 }

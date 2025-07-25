@@ -18,11 +18,6 @@
 
     <main>
         <div id="play-area">
-            <div id="order-display">
-                <h3>Current Order:</h3>
-                <div id="order-items"></div>
-                <div id="order-count">Make <span id="items-needed">0</span> items</div>
-            </div>
 
             <img id="princess" class="character" src="assets/princess-pink-bg.png" alt="Princess">
             
@@ -45,7 +40,6 @@
             </div>
             
             <div id="coffee-station" class="station">
-                <h4>Coffee Station</h4>
                 <div class="station-items">
                     <img src="assets/coffee-cup.png" alt="Coffee" class="station-item">
                 </div>
@@ -61,7 +55,6 @@
             </div>
 
             <div id="cupcake-station" class="station">
-                <h4>Cupcake Station</h4>
                 <div class="station-items">
                     <img src="assets/cupcake.png" alt="Cupcake" class="station-item">
                 </div>
@@ -77,7 +70,6 @@
             </div>
 
             <div id="donut-station" class="station">
-                <h4>Donut Station</h4>
                 <div class="station-items">
                     <img src="assets/donut.png" alt="Donut" class="station-item">
                 </div>
@@ -94,7 +86,11 @@
 
             <div id="customer-area">
                 <img id="current-customer" src="assets/customer1.png" alt="Customer">
-                <div id="delivery-zone">Delivery Zone</div>
+                <div id="delivery-zone">
+                    <div class="delivery-title">Delivery Zone</div>
+                    <div id="order-items"></div>
+                    <div id="order-count">Make <span id="items-needed">0</span> items</div>
+                </div>
                 <div id="customer-speech">Waiting for order...</div>
             </div>
 
@@ -103,14 +99,14 @@
     </main>
 
     <footer>
-        <p>Use arrow keys, Xbox 360 controller, or tilt to move the princess around the coffee shop!</p>
+        <p>Use arrow keys, Xbox 360 controller, touch/swipe gestures, or tilt to move the princess around the coffee shop!</p>
     </footer>
 
     <div id="help-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>How to Play</h2>
-            <p>1. Move the princess around using arrow keys, gamepad, or tilt controls</p>
+            <p>1. Move the princess around using arrow keys, gamepad, touch/swipe, or tilt controls</p>
             <p>2. Go to the Coffee Station (left) to make items</p>
             <p>3. Count how many items the customer needs</p>
             <p>4. Go to the Delivery Zone (right) to serve the customer</p>
