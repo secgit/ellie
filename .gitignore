@@ -4,3 +4,5 @@ prompts/*
 GEMINI.md
 AGENTS.md
 CLAUDE.md
+princess-coffee-shop/venv/*
+.claude/*
