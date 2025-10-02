@@ -1,0 +1,34 @@
+<svg width="420" height="360" viewBox="0 0 420 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="360" rx="48" fill="url(#bg)"/>
+  <g filter="url(#shadow)">
+    <path d="M120 270C120 198 168 130 210 130C252 130 300 198 300 270C300 312 260 322 210 322C160 322 120 312 120 270Z" fill="#F5D9B0"/>
+    <path d="M172 150C154 118 126 98 100 98C82 98 68 106 60 120C88 126 110 138 130 158L172 150Z" fill="#D8B48B"/>
+    <path d="M248 150C266 118 294 98 320 98C338 98 352 106 360 120C332 126 310 138 290 158L248 150Z" fill="#D8B48B"/>
+    <path d="M210 268C244 268 270 244 270 210C270 176 244 148 210 148C176 148 150 176 150 210C150 244 176 268 210 268Z" fill="#EBCDA2"/>
+    <ellipse cx="182" cy="212" rx="16" ry="22" fill="#2D2220"/>
+    <ellipse cx="238" cy="212" rx="16" ry="22" fill="#2D2220"/>
+    <circle cx="178" cy="206" r="4" fill="white"/>
+    <circle cx="234" cy="206" r="4" fill="white"/>
+    <path d="M210 216C202 216 196 222 196 230C196 238 202 244 210 244C218 244 224 238 224 230C224 222 218 216 210 216Z" fill="#2D2220"/>
+    <path d="M210 244C198 244 188 254 188 266C188 278 198 288 210 288C222 288 232 278 232 266C232 254 222 244 210 244Z" fill="#F7B36B"/>
+    <circle cx="178" cy="180" r="10" fill="#F7B36B"/>
+    <circle cx="242" cy="180" r="10" fill="#F7B36B"/>
+    <path d="M150 254C168 268 188 276 210 276C232 276 252 268 270 254" stroke="#DAAF74" stroke-width="14" stroke-linecap="round"/>
+  </g>
+  <g opacity="0.7">
+    <ellipse cx="118" cy="312" rx="36" ry="18" fill="#5DAA72"/>
+    <ellipse cx="304" cy="314" rx="38" ry="18" fill="#5DAA72"/>
+    <ellipse cx="210" cy="326" rx="90" ry="22" fill="#5DAA72"/>
+  </g>
+  <defs>
+    <linearGradient id="bg" x1="210" y1="0" x2="210" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF5E3"/>
+      <stop offset="1" stop-color="#FFE7C8"/>
+    </linearGradient>
+    <filter id="shadow" x="60" y="80" width="300" height="300" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feOffset dy="8"/>
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feBlend in="SourceGraphic" in2="blur" mode="normal"/>
+    </filter>
+  </defs>
+</svg>

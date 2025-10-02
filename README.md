@@ -31,6 +31,15 @@ Explore a magical castle in this enchanting adventure game. Discover rooms, coll
 - 🎨 Beautiful Graphics
 - 🎯 Educational Spelling Challenges
 
+### 🌲 Forest Friends Picnic
+Join woodland pals for a cozy picnic! Listen to each friend’s clue and pick the snack that matches their favorite forest treat.
+
+**Features:**
+- 🦊 Adorable Animal Cast
+- 🧠 Listening & Deduction Practice
+- 🌟 Calming Visual Celebrations
+- 📱 Optimized for Touch and Desktop
+
 ## 🚀 Getting Started
 
 1. **Play Online**: Simply open `index.html` in your web browser to access the game collection landing page
@@ -46,6 +55,8 @@ ellie/
 ├── animal-adventure/       # Eleanor's Animal Adventure game
 ├── animal-matching/        # Animal Matching game
 ├── princess-castle/        # Princess Castle Adventure game
+├── princess-coffee-shop/   # Princess Coffee Shop game
+├── forest-picnic/          # Forest Friends Picnic game
 ├── README.md              # This file
 └── assets/                # Shared images and resources
 ```

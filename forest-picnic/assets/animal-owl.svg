@@ -1,0 +1,33 @@
+<svg width="420" height="360" viewBox="0 0 420 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="360" rx="48" fill="url(#bg)"/>
+  <g filter="url(#shadow)">
+    <path d="M120 270C120 190 168 120 210 120C252 120 300 190 300 270C300 310 260 320 210 320C160 320 120 310 120 270Z" fill="#D8E4FF"/>
+    <path d="M210 260C250 260 286 240 286 200C286 160 250 130 210 130C170 130 134 160 134 200C134 240 170 260 210 260Z" fill="#AFC3F9"/>
+    <circle cx="170" cy="200" r="40" fill="#F8FBFF"/>
+    <circle cx="250" cy="200" r="40" fill="#F8FBFF"/>
+    <circle cx="170" cy="200" r="18" fill="#2D2220"/>
+    <circle cx="250" cy="200" r="18" fill="#2D2220"/>
+    <circle cx="162" cy="192" r="6" fill="white"/>
+    <circle cx="242" cy="192" r="6" fill="white"/>
+    <path d="M210 198C202 198 198 204 198 210C198 216 202 220 210 220C218 220 222 216 222 210C222 204 218 198 210 198Z" fill="#F7A94C"/>
+    <path d="M160 250C176 260 196 266 210 266C224 266 244 260 260 250" stroke="#8398DB" stroke-width="14" stroke-linecap="round"/>
+    <path d="M150 146C140 130 124 122 108 122C96 122 86 128 80 138C106 146 128 156 150 170V146Z" fill="#AFC3F9"/>
+    <path d="M270 146C280 130 296 122 312 122C324 122 334 128 340 138C314 146 292 156 270 170V146Z" fill="#AFC3F9"/>
+  </g>
+  <g opacity="0.65">
+    <ellipse cx="120" cy="314" rx="36" ry="18" fill="#5DAA72"/>
+    <ellipse cx="300" cy="312" rx="38" ry="18" fill="#5DAA72"/>
+    <ellipse cx="210" cy="326" rx="88" ry="20" fill="#5DAA72"/>
+  </g>
+  <defs>
+    <linearGradient id="bg" x1="210" y1="0" x2="210" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5F8FF"/>
+      <stop offset="1" stop-color="#E0EBFF"/>
+    </linearGradient>
+    <filter id="shadow" x="60" y="80" width="300" height="280" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feOffset dy="8"/>
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feBlend in="SourceGraphic" in2="blur" mode="normal"/>
+    </filter>
+  </defs>
+</svg>
