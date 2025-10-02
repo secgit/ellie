@@ -6,28 +6,28 @@ const animals = [
     name: 'Willow the Fox',
     story: 'I dash through the berry bushes each morning. Can you guess my favorite snack?',
     favoriteTreat: 'berries',
-    image: 'assets/animal-fox.svg'
+    image: 'assets/animal-fox.png'
   },
   {
     id: 'bunny',
     name: 'Juniper the Bunny',
     story: 'My ears wiggle when I see something crisp and crunchy from the garden!',
     favoriteTreat: 'carrots',
-    image: 'assets/animal-bunny.svg'
+    image: 'assets/animal-bunny.png'
   },
   {
     id: 'owl',
     name: 'Sage the Owl',
     story: 'When the moon glows, I collect twinkling treats that shine softly in the night.',
     favoriteTreat: 'mushrooms',
-    image: 'assets/animal-owl.svg'
+    image: 'assets/animal-owl.png'
   },
   {
     id: 'deer',
     name: 'Maple the Deer',
     story: 'I nibble on crunchy treasures that tumble from the tallest oak trees.',
     favoriteTreat: 'acorns',
-    image: 'assets/animal-deer.svg'
+    image: 'assets/animal-deer.png'
   }
 ];
 
