@@ -1,0 +1,23 @@
+<svg width="220" height="200" viewBox="0 0 220 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="200" rx="32" fill="url(#bg)"/>
+  <g filter="url(#shadow)">
+    <path d="M70 150C50 120 64 90 92 84C110 80 130 90 138 108C152 90 184 98 190 120C194 136 186 152 170 158C160 162 148 160 140 152C126 168 100 170 84 160C78 156 74 154 70 150Z" fill="url(#berry)"/>
+    <path d="M94 80C90 60 108 40 126 44C134 46 142 54 144 64" stroke="#5BBE5C" stroke-width="14" stroke-linecap="round"/>
+    <path d="M126 70C126 58 138 50 148 54C154 56 158 62 160 68" stroke="#5BBE5C" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <defs>
+    <linearGradient id="bg" x1="110" y1="0" x2="110" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7FD"/>
+      <stop offset="1" stop-color="#FFE4F6"/>
+    </linearGradient>
+    <linearGradient id="berry" x1="80" y1="84" x2="182" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7BA6"/>
+      <stop offset="1" stop-color="#E23B74"/>
+    </linearGradient>
+    <filter id="shadow" x="40" y="32" width="170" height="150" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feOffset dy="6"/>
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feBlend in="SourceGraphic" in2="blur" mode="normal"/>
+    </filter>
+  </defs>
+</svg>
