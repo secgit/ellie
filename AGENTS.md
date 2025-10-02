@@ -1,7 +1,7 @@
 ## General Instructions:
 
 1. ALWAYS use GitHub CLI (`gh`) for all github operations. `GITHUB_TOKEN` is provided via an environment variable. Do **not** expose or persist secrets.
-2. For image generation tasks, always use the Gemini REST API, below is a working example excluding the API key:
+2. For image generation tasks, always use the Gemini REST API, below is a working example using curl. `GEMINI_API_KEY` is provided via an environment variable. Do **not** expose or persist secrets.
 
 curl -s -X POST
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent" \
