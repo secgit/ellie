@@ -342,9 +342,13 @@
         function generateSnowflakePattern() {
             artboard.innerHTML = '';
             let regionIndex = 1;
-            const maxDepth = 3;
+            const maxDepth = 2;
+            const MAX_REGIONS = 50;
 
             function addTriangle(p1, p2, p3) {
+                if (regionIndex > MAX_REGIONS) {
+                    return;
+                }
                 const path = document.createElementNS(svgNS, 'path');
                 const d = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y} L ${p3.x} ${p3.y} Z`;
                 path.setAttribute('d', d);
@@ -373,6 +377,9 @@
             }
 
             function createFractal(p1, p2, p3, depth) {
+                if (regionIndex > MAX_REGIONS) {
+                    return;
+                }
                 if (depth > maxDepth) {
                     addTriangle(p1, p2, p3);
                     return;
