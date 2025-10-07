@@ -40,6 +40,15 @@ Join woodland pals for a cozy picnic! Listen to each friend’s clue and pick th
 - 🌟 Calming Visual Celebrations
 - 📱 Optimized for Touch and Desktop
 
+### 🎨 Coloring Studio
+Bring a black-and-white fractal mosaic to life with your own palette! Tap a color, paint the matching number, and swipe to fill whole sections just like classic paint-by-numbers.
+
+**Features:**
+- 🖌️ Tap & Drag Painting
+- 🎲 Dynamically Generated Patterns
+- 🌈 8 Kid-Friendly Color Swatches
+- 📱 Designed for Mobile Screens
+
 ## 🚀 Getting Started
 
 1. **Play Online**: Simply open `index.html` in your web browser to access the game collection landing page
@@ -57,6 +66,7 @@ ellie/
 ├── princess-castle/        # Princess Castle Adventure game
 ├── princess-coffee-shop/   # Princess Coffee Shop game
 ├── forest-picnic/          # Forest Friends Picnic game
+├── coloring-studio/        # Paint-by-numbers coloring experience
 ├── README.md              # This file
 └── assets/                # Shared images and resources
 ```
