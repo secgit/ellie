@@ -422,6 +422,9 @@
             const p3 = { x: cx + side / 2, y: cy + h / 3 };
 
             createFractal(p1, p2, p3, 0);
+
+            const totalRegions = regionIndex - 1;
+            console.log(`[Coloring Studio] Generated ${totalRegions} paintable regions.`);
         }
 
 
