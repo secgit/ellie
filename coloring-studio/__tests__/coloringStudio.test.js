@@ -14,7 +14,17 @@ const { JSDOM } = require('jsdom');
 
 async function loadColoringStudio() {
   const filePath = path.join(__dirname, '..', 'index.html');
-  const html = await fs.promises.readFile(filePath, 'utf8');
+  let html = await fs.promises.readFile(filePath, 'utf8');
+
+  const mockScript = `
+    <script>
+      if (typeof SVGElement.prototype.getBBox === 'undefined') {
+        SVGElement.prototype.getBBox = () => ({ x: 0, y: 0, width: 0, height: 0 });
+      }
+    </script>
+  `;
+  html = html.replace('</head>', `${mockScript}</head>`);
+
   const dom = new JSDOM(html, {
     url: 'http://localhost/',
     runScripts: 'dangerously',
