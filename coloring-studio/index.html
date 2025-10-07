@@ -229,6 +229,13 @@
             color: var(--muted);
         }
 
+        @media (max-width: 899px) {
+            .studio {
+                display: flex;
+                flex-direction: column-reverse;
+            }
+        }
+
         @media (min-width: 900px) {
             .studio {
                 grid-template-columns: 320px 1fr;
@@ -342,86 +349,56 @@
         function generateSnowflakePattern() {
             artboard.innerHTML = '';
             let regionIndex = 1;
-            const maxDepth = 3;
+            const width = 600;
+            const height = 780;
 
-            function addTriangle(p1, p2, p3) {
+            function addPath(d, labelSize = 20) {
                 const path = document.createElementNS(svgNS, 'path');
-                const d = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y} L ${p3.x} ${p3.y} Z`;
                 path.setAttribute('d', d);
                 path.setAttribute('fill', '#ffffff');
                 path.setAttribute('stroke', '#111');
                 path.setAttribute('stroke-width', '3');
                 path.classList.add('paint-cell');
                 path.dataset.index = regionIndex;
-                artboard.appendChild(path);
 
                 const label = document.createElementNS(svgNS, 'text');
                 label.textContent = regionIndex;
-                const centerX = (p1.x + p2.x + p3.x) / 3;
-                const centerY = (p1.y + p2.y + p3.y) / 3;
+
+                const tempPathForBBox = document.createElementNS(svgNS, 'path');
+                tempPathForBBox.setAttribute('d', d);
+                artboard.appendChild(tempPathForBBox);
+                const bbox = tempPathForBBox.getBBox();
+                artboard.removeChild(tempPathForBBox);
+
+                const centerX = bbox.x + bbox.width / 2;
+                const centerY = bbox.y + bbox.height / 2;
+
                 label.setAttribute('x', centerX);
-                label.setAttribute('y', centerY + 8);
+                label.setAttribute('y', centerY + (labelSize / 3));
                 label.setAttribute('text-anchor', 'middle');
+                label.setAttribute('dominant-baseline', 'middle');
                 label.setAttribute('fill', '#c7c4d9');
                 label.setAttribute('font-family', 'Quicksand, Nunito, sans-serif');
-                const sideLength = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-                label.setAttribute('font-size', Math.max(12, sideLength / 4));
+                label.setAttribute('font-size', labelSize);
                 label.setAttribute('pointer-events', 'none');
-                artboard.appendChild(label);
 
+                artboard.appendChild(path);
+                artboard.appendChild(label);
                 regionIndex++;
             }
 
-            function createFractal(p1, p2, p3, depth) {
-                if (depth > maxDepth) {
-                    addTriangle(p1, p2, p3);
-                    return;
-                }
+            const paths = [
+                "M 0,0 C 250,150 350,150 600,0 L 600,780 L 0,780 Z",
+                "M 0,0 C 150,250 150,350 0,600 Z",
+                "M 600,0 C 450,250 450,350 600,600 Z",
+                "M 0,780 C 250,630 350,630 600,780 Z",
+                "M 300,100 a 100,100 0 1,0 1,0 Z",
+                "M 150,400 a 80,80 0 1,1 0,-1 z",
+                "M 450,400 a 80,80 0 1,0 0,1 z",
+                "M 300, 600 m -50, 0 a 50,50 0 1,0 100,0 a 50,50 0 1,0 -100,0"
+            ];
 
-                // Add central triangle
-                if (depth === 0) {
-                    addTriangle(p1, p2, p3);
-                }
-
-                const newDepth = depth + 1;
-
-                const addOuterTriangle = (pt1, pt2) => {
-                    const dx = pt2.x - pt1.x;
-                    const dy = pt2.y - pt1.y;
-                    const length = Math.sqrt(dx * dx + dy * dy);
-                    const angle = Math.atan2(dy, dx);
-
-                    const newLength = length / 3.0;
-                    const h = newLength * Math.sqrt(3) / 2;
-
-                    const p3x = pt1.x + dx / 3;
-                    const p3y = pt1.y + dy / 3;
-                    const p4x = pt1.x + 2 * dx / 3;
-                    const p4y = pt1.y + 2 * dy / 3;
-
-                    const p5x = p3x + (p4x - p3x) / 2 - h * Math.sin(angle);
-                    const p5y = p3y + (p4y - p3y) / 2 + h * Math.cos(angle);
-
-                    createFractal({ x: p3x, y: p3y }, { x: p5x, y: p5y }, { x: p4x, y: p4y }, newDepth);
-                };
-
-                addOuterTriangle(p1, p2);
-                addOuterTriangle(p2, p3);
-                addOuterTriangle(p3, p1);
-            }
-
-            const width = 540;
-            const height = 720;
-            const side = Math.min(width, height) * 0.8;
-            const h = side * Math.sqrt(3) / 2;
-            const cx = 300;
-            const cy = 420;
-
-            const p1 = { x: cx, y: cy - h / 1.5 };
-            const p2 = { x: cx - side / 2, y: cy + h / 3 };
-            const p3 = { x: cx + side / 2, y: cy + h / 3 };
-
-            createFractal(p1, p2, p3, 0);
+            paths.forEach(path => addPath(path, 40));
 
             const totalRegions = regionIndex - 1;
             console.log(`[Coloring Studio] Generated ${totalRegions} paintable regions.`);
