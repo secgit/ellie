@@ -5,3 +5,4 @@ GEMINI.md
 CLAUDE.md
 princess-coffee-shop/venv/*
 .claude/*
+node_modules/
