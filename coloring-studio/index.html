@@ -339,65 +339,91 @@
             return Math.random() * (max - min) + min;
         }
 
-        function generatePattern() {
+        function generateSnowflakePattern() {
             artboard.innerHTML = '';
             let regionIndex = 1;
+            const maxDepth = 3;
 
-            function carve(x, y, width, height, depth = 0) {
-                const minSize = 90;
-                const maxDepth = 4;
-                const shouldSplit = depth < maxDepth && (width > minSize || height > minSize);
-                const chanceToStop = 0.25 + depth * 0.12;
+            function addTriangle(p1, p2, p3) {
+                const path = document.createElementNS(svgNS, 'path');
+                const d = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y} L ${p3.x} ${p3.y} Z`;
+                path.setAttribute('d', d);
+                path.setAttribute('fill', '#ffffff');
+                path.setAttribute('stroke', '#111');
+                path.setAttribute('stroke-width', '3');
+                path.classList.add('paint-cell');
+                path.dataset.index = regionIndex;
+                artboard.appendChild(path);
 
-                if (!shouldSplit || Math.random() < chanceToStop) {
-                    const path = document.createElementNS(svgNS, 'path');
-                    const d = `M ${x} ${y} L ${x + width} ${y} L ${x + width} ${y + height} L ${x} ${y + height} Z`;
-                    path.setAttribute('d', d);
-                    path.setAttribute('fill', '#ffffff');
-                    path.setAttribute('stroke', '#111');
-                    path.setAttribute('stroke-width', '3');
-                    path.classList.add('paint-cell');
-                    path.dataset.index = regionIndex;
-                    artboard.appendChild(path);
+                const label = document.createElementNS(svgNS, 'text');
+                label.textContent = regionIndex;
+                const centerX = (p1.x + p2.x + p3.x) / 3;
+                const centerY = (p1.y + p2.y + p3.y) / 3;
+                label.setAttribute('x', centerX);
+                label.setAttribute('y', centerY + 8);
+                label.setAttribute('text-anchor', 'middle');
+                label.setAttribute('fill', '#c7c4d9');
+                label.setAttribute('font-family', 'Quicksand, Nunito, sans-serif');
+                const sideLength = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+                label.setAttribute('font-size', Math.max(12, sideLength / 4));
+                label.setAttribute('pointer-events', 'none');
+                artboard.appendChild(label);
 
-                    const label = document.createElementNS(svgNS, 'text');
-                    label.textContent = regionIndex;
-                    label.setAttribute('x', x + width / 2);
-                    label.setAttribute('y', y + height / 2 + 12);
-                    label.setAttribute('text-anchor', 'middle');
-                    label.setAttribute('fill', '#c7c4d9');
-                    label.setAttribute('font-family', 'Quicksand, Nunito, sans-serif');
-                    label.setAttribute('font-size', Math.max(20, Math.min(width, height) / 3));
-                    label.setAttribute('pointer-events', 'none');
-                    artboard.appendChild(label);
+                regionIndex++;
+            }
 
-                    regionIndex += 1;
+            function createFractal(p1, p2, p3, depth) {
+                if (depth > maxDepth) {
+                    addTriangle(p1, p2, p3);
                     return;
                 }
 
-                const orientation = width > height ? 'vertical' : 'horizontal';
-                const crossSplit = Math.random() < 0.2 && width > minSize * 1.8 && height > minSize * 1.8;
-
-                if (crossSplit) {
-                    const splitX = x + randomBetween(width * 0.35, width * 0.65);
-                    const splitY = y + randomBetween(height * 0.35, height * 0.65);
-                    carve(x, y, splitX - x, splitY - y, depth + 1);
-                    carve(splitX, y, x + width - splitX, splitY - y, depth + 1);
-                    carve(x, splitY, splitX - x, y + height - splitY, depth + 1);
-                    carve(splitX, splitY, x + width - splitX, y + height - splitY, depth + 1);
-                } else if (orientation === 'vertical') {
-                    const split = randomBetween(width * 0.35, width * 0.65);
-                    carve(x, y, split, height, depth + 1);
-                    carve(x + split, y, width - split, height, depth + 1);
-                } else {
-                    const split = randomBetween(height * 0.35, height * 0.65);
-                    carve(x, y, width, split, depth + 1);
-                    carve(x, y + split, width, height - split, depth + 1);
+                // Add central triangle
+                if (depth === 0) {
+                    addTriangle(p1, p2, p3);
                 }
+
+                const newDepth = depth + 1;
+
+                const addOuterTriangle = (pt1, pt2) => {
+                    const dx = pt2.x - pt1.x;
+                    const dy = pt2.y - pt1.y;
+                    const length = Math.sqrt(dx * dx + dy * dy);
+                    const angle = Math.atan2(dy, dx);
+
+                    const newLength = length / 3.0;
+                    const h = newLength * Math.sqrt(3) / 2;
+
+                    const p3x = pt1.x + dx / 3;
+                    const p3y = pt1.y + dy / 3;
+                    const p4x = pt1.x + 2 * dx / 3;
+                    const p4y = pt1.y + 2 * dy / 3;
+
+                    const p5x = p3x + (p4x - p3x) / 2 - h * Math.sin(angle);
+                    const p5y = p3y + (p4y - p3y) / 2 + h * Math.cos(angle);
+
+                    createFractal({ x: p3x, y: p3y }, { x: p5x, y: p5y }, { x: p4x, y: p4y }, newDepth);
+                };
+
+                addOuterTriangle(p1, p2);
+                addOuterTriangle(p2, p3);
+                addOuterTriangle(p3, p1);
             }
 
-            carve(30, 30, 540, 720);
+            const width = 540;
+            const height = 720;
+            const side = Math.min(width, height) * 0.8;
+            const h = side * Math.sqrt(3) / 2;
+            const cx = 300;
+            const cy = 420;
+
+            const p1 = { x: cx, y: cy - h / 1.5 };
+            const p2 = { x: cx - side / 2, y: cy + h / 3 };
+            const p3 = { x: cx + side / 2, y: cy + h / 3 };
+
+            createFractal(p1, p2, p3, 0);
         }
+
 
         function paintCell(element) {
             element.setAttribute('fill', currentColor);
@@ -431,7 +457,7 @@
         }
 
         regenerateBtn.addEventListener('click', () => {
-            generatePattern();
+            generateSnowflakePattern();
         });
 
         clearBtn.addEventListener('click', () => {
@@ -441,7 +467,7 @@
         });
 
         createPalette();
-        generatePattern();
+        generateSnowflakePattern();
         attachPaintingEvents();
     </script>
 </body>
