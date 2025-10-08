@@ -346,13 +346,83 @@
             return Math.random() * (max - min) + min;
         }
 
+        function degToRad(degrees) {
+            return (degrees * Math.PI) / 180;
+        }
+
+        function polarToCartesian(cx, cy, radius, angleInDegrees) {
+            const angleInRadians = degToRad(angleInDegrees);
+            return {
+                x: cx + radius * Math.cos(angleInRadians),
+                y: cy + radius * Math.sin(angleInRadians)
+            };
+        }
+
+        function createRingSegmentPath(cx, cy, innerRadius, outerRadius, startAngle, endAngle) {
+            const outerStart = polarToCartesian(cx, cy, outerRadius, startAngle);
+            const outerEnd = polarToCartesian(cx, cy, outerRadius, endAngle);
+            const innerEnd = polarToCartesian(cx, cy, innerRadius, endAngle);
+            const innerStart = polarToCartesian(cx, cy, innerRadius, startAngle);
+            const largeArc = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
+
+            return [
+                `M ${outerStart.x},${outerStart.y}`,
+                `A ${outerRadius},${outerRadius} 0 ${largeArc} 1 ${outerEnd.x},${outerEnd.y}`,
+                `L ${innerEnd.x},${innerEnd.y}`,
+                `A ${innerRadius},${innerRadius} 0 ${largeArc} 0 ${innerStart.x},${innerStart.y}`,
+                'Z'
+            ].join(' ');
+        }
+
+        function createPetalPath(cx, cy, baseRadius, length, angle, spread) {
+            const baseLeft = polarToCartesian(cx, cy, baseRadius, angle - spread);
+            const baseRight = polarToCartesian(cx, cy, baseRadius, angle + spread);
+            const controlLeft = polarToCartesian(cx, cy, (baseRadius + length) / 2, angle - spread / 2);
+            const controlRight = polarToCartesian(cx, cy, (baseRadius + length) / 2, angle + spread / 2);
+            const tip = polarToCartesian(cx, cy, length, angle);
+
+            return [
+                `M ${baseLeft.x},${baseLeft.y}`,
+                `Q ${controlLeft.x},${controlLeft.y} ${tip.x},${tip.y}`,
+                `Q ${controlRight.x},${controlRight.y} ${baseRight.x},${baseRight.y}`,
+                `L ${cx},${cy}`,
+                'Z'
+            ].join(' ');
+        }
+
+        function createStarPath(cx, cy, outerRadius, innerRadius, points) {
+            const step = Math.PI / points;
+            let d = '';
+
+            for (let i = 0; i < points * 2; i++) {
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const angle = -Math.PI / 2 + step * i;
+                const x = cx + radius * Math.cos(angle);
+                const y = cy + radius * Math.sin(angle);
+                d += i === 0 ? `M ${x},${y}` : `L ${x},${y}`;
+            }
+
+            return `${d} Z`;
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(randomBetween(min, max + 1));
+        }
+
         function generateSnowflakePattern() {
             artboard.innerHTML = '';
             let regionIndex = 1;
             const width = 600;
             const height = 780;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRegions = 50;
 
             function addPath(d, labelSize = 20) {
+                if (regionIndex > maxRegions) {
+                    return false;
+                }
+
                 const path = document.createElementNS(svgNS, 'path');
                 path.setAttribute('d', d);
                 path.setAttribute('fill', '#ffffff');
@@ -370,11 +440,11 @@
                 const bbox = tempPathForBBox.getBBox();
                 artboard.removeChild(tempPathForBBox);
 
-                const centerX = bbox.x + bbox.width / 2;
-                const centerY = bbox.y + bbox.height / 2;
+                const centerLabelX = bbox.x + bbox.width / 2;
+                const centerLabelY = bbox.y + bbox.height / 2;
 
-                label.setAttribute('x', centerX);
-                label.setAttribute('y', centerY + (labelSize / 3));
+                label.setAttribute('x', centerLabelX);
+                label.setAttribute('y', centerLabelY + (labelSize / 3));
                 label.setAttribute('text-anchor', 'middle');
                 label.setAttribute('dominant-baseline', 'middle');
                 label.setAttribute('fill', '#c7c4d9');
@@ -385,23 +455,65 @@
                 artboard.appendChild(path);
                 artboard.appendChild(label);
                 regionIndex++;
+                return true;
             }
 
-            const paths = [
-                "M 0,0 C 250,150 350,150 600,0 L 600,780 L 0,780 Z",
-                "M 0,0 C 150,250 150,350 0,600 Z",
-                "M 600,0 C 450,250 450,350 600,600 Z",
-                "M 0,780 C 250,630 350,630 600,780 Z",
-                "M 300,100 a 100,100 0 1,0 1,0 Z",
-                "M 150,400 a 80,80 0 1,1 0,-1 z",
-                "M 450,400 a 80,80 0 1,0 0,1 z",
-                "M 300, 600 m -50, 0 a 50,50 0 1,0 100,0 a 50,50 0 1,0 -100,0"
-            ];
+            const maxRadius = Math.min(width, height) * 0.48;
+            let currentRadius = randomBetween(60, 90);
+            const ringCount = randomInt(3, 4);
 
-            paths.forEach(path => addPath(path, 40));
+            for (let ring = 0; ring < ringCount && regionIndex <= maxRegions; ring++) {
+                const ringThickness = randomBetween(60, 100);
+                const innerRadius = currentRadius;
+                const outerRadius = Math.min(maxRadius, innerRadius + ringThickness);
+                const segments = randomInt(5, 8);
+                const segmentAngle = 360 / segments;
+                const offset = randomBetween(0, segmentAngle);
+
+                for (let segment = 0; segment < segments && regionIndex <= maxRegions; segment++) {
+                    const startAngle = offset + segment * segmentAngle;
+                    const arcMultiplier = randomBetween(0.78, 1.15);
+                    const endAngle = startAngle + segmentAngle * arcMultiplier;
+                    const path = createRingSegmentPath(centerX, centerY, innerRadius, outerRadius, startAngle, endAngle);
+                    addPath(path, 26 - ring * 2);
+                }
+
+                currentRadius = outerRadius + randomBetween(20, 40);
+                if (currentRadius >= maxRadius - 40) {
+                    break;
+                }
+            }
+
+            const petalCount = randomInt(6, 9);
+            const petalBase = currentRadius * 0.6;
+            const petalLength = Math.min(maxRadius + 80, currentRadius + randomBetween(120, 180));
+            const petalSpread = randomBetween(18, 32);
+
+            for (let i = 0; i < petalCount && regionIndex <= maxRegions; i++) {
+                const angle = (360 / petalCount) * i + randomBetween(-10, 10);
+                const petalPath = createPetalPath(centerX, centerY, petalBase, petalLength, angle, petalSpread);
+                addPath(petalPath, 24);
+            }
+
+            const starOuter = currentRadius * 0.65;
+            const starInner = starOuter * randomBetween(0.35, 0.55);
+            const starPoints = randomInt(5, 8);
+            const starPath = createStarPath(centerX, centerY, starOuter, starInner, starPoints);
+            addPath(starPath, 30);
+
+            const ringHighlightCount = randomInt(4, 6);
+            for (let highlight = 0; highlight < ringHighlightCount && regionIndex <= maxRegions; highlight++) {
+                const highlightRadius = randomBetween(currentRadius * 0.6, maxRadius);
+                const highlightWidth = randomBetween(20, 45);
+                const startAngle = randomBetween(0, 360);
+                const endAngle = startAngle + randomBetween(40, 110);
+                const highlightPath = createRingSegmentPath(centerX, centerY, Math.max(20, highlightRadius - highlightWidth), highlightRadius, startAngle, endAngle);
+                addPath(highlightPath, 18);
+            }
 
             const totalRegions = regionIndex - 1;
             console.log(`[Coloring Studio] Generated ${totalRegions} paintable regions.`);
+            painting = false;
         }
 
 
