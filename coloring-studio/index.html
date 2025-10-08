@@ -45,8 +45,23 @@
             background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(108, 99, 255, 0));
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: stretch;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             gap: 0.85rem;
+            width: 100%;
+        }
+
+        .header-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
         }
 
         .back-button {
@@ -74,10 +89,55 @@
             box-shadow: 0 8px 18px -12px rgba(108, 99, 255, 0.65);
         }
 
-        header h1 {
+        .header-title {
             margin: 0;
             font-size: clamp(1.8rem, 5vw, 2.6rem);
             color: var(--accent);
+        }
+
+        .header-icon-button {
+            border: none;
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--accent);
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            box-shadow: 0 10px 22px -18px rgba(108, 99, 255, 0.75);
+        }
+
+        .header-icon-button:hover,
+        .header-icon-button:focus-visible {
+            background: rgba(108, 99, 255, 0.18);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 28px -16px rgba(108, 99, 255, 0.7);
+            outline: none;
+        }
+
+        .header-icon-button:active {
+            transform: translateY(0);
+            box-shadow: 0 8px 18px -14px rgba(108, 99, 255, 0.65);
+        }
+
+        .header-label {
+            display: none;
+        }
+
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
         }
 
         header p {
@@ -136,39 +196,6 @@
             outline: 3px solid rgba(108, 99, 255, 0.35);
         }
 
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-
-        .action-button {
-            border: none;
-            border-radius: 999px;
-            padding: 0.75rem 1.25rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .action-button.primary {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 12px 24px -12px rgba(108, 99, 255, 0.9);
-        }
-
-        .action-button.secondary {
-            background: rgba(108, 99, 255, 0.08);
-            color: var(--accent);
-        }
-
-        .action-button:active {
-            transform: scale(0.98);
-        }
 
         .canvas-area {
             background: linear-gradient(145deg, rgba(108, 99, 255, 0.12), rgba(108, 99, 255, 0.02));
@@ -260,8 +287,44 @@
             }
 
             header {
-                padding: 1rem 1.25rem 0.85rem;
+                padding: 0.65rem 0.85rem 0.55rem;
+                gap: 0.35rem;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .header-bar {
                 gap: 0.5rem;
+            }
+
+            .header-actions {
+                gap: 0.4rem;
+            }
+
+            .header-icon-button {
+                font-size: 1.2rem;
+            }
+
+            .header-title {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            .header-label {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                font-weight: 600;
+                font-size: 1rem;
+                color: var(--accent);
             }
 
             header p {
@@ -301,14 +364,10 @@
 
             .toolbar {
                 display: grid;
-                grid-template-areas:
-                    'palette'
-                    'actions';
                 gap: 0.75rem;
             }
 
             .palette {
-                grid-area: palette;
                 display: grid;
                 grid-template-columns: repeat(4, minmax(0, 1fr));
                 gap: 0.5rem;
@@ -323,21 +382,6 @@
             .swatch-preview {
                 width: 28px;
                 height: 28px;
-            }
-
-            .actions {
-                grid-area: actions;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 0.5rem;
-            }
-
-            .action-button {
-                flex: 1 1 calc(50% - 0.5rem);
-                justify-content: center;
-                padding: 0.65rem 0.75rem;
-                font-size: 0.8rem;
             }
 
             .numbers-hint,
@@ -355,17 +399,26 @@
 <body>
     <main>
         <header>
-            <button class="back-button" type="button" onclick="window.location.href='../index.html'">← Back to Games</button>
-            <h1>Coloring Studio</h1>
+            <div class="header-bar">
+                <button class="back-button" type="button" onclick="window.location.href='../index.html'">← Back to Games</button>
+                <span class="header-label" aria-hidden="true">🎨 Studio</span>
+                <div class="header-actions">
+                    <button class="header-icon-button" id="regenerate" type="button">
+                        <span aria-hidden="true">🔁</span>
+                        <span class="visually-hidden">New Pattern</span>
+                    </button>
+                    <button class="header-icon-button" id="clear" type="button">
+                        <span aria-hidden="true">🧽</span>
+                        <span class="visually-hidden">Clear Colors</span>
+                    </button>
+                </div>
+            </div>
+            <h1 class="header-title">Coloring Studio</h1>
             <p>Create your own masterpiece! Choose a color, tap a numbered section, and watch the fractal mosaic come alive. The pattern refreshes every time you visit or press regenerate.</p>
         </header>
         <div class="studio">
             <aside class="toolbar">
                 <div class="palette" id="palette"></div>
-                <div class="actions">
-                    <button class="action-button primary" id="regenerate">🔁 New Pattern</button>
-                    <button class="action-button secondary" id="clear">🧽 Clear Colors</button>
-                </div>
                 <p class="numbers-hint">Tip: Drag your finger across the artboard to paint multiple regions in one motion. Every shape is outlined in bold black lines just like a coloring book.</p>
                 <div class="legend" id="legend"></div>
             </aside>

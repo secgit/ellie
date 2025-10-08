@@ -143,4 +143,28 @@ describe('Coloring Studio paint-by-numbers experience', () => {
     expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.canvas-area\s*{[\s\S]*min-height:\s*0/i);
     expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.canvas-wrapper\s*{[\s\S]*display:\s*flex/i);
   });
+
+  test('mobile header switches to a compact horizontal layout with accessible title treatment', () => {
+    const styles = Array.from(document.querySelectorAll('style'))
+      .map((styleTag) => styleTag.textContent)
+      .join('\n');
+
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*header\s*{[\s\S]*flex-direction:\s*row/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*header\s*{[\s\S]*align-items:\s*center/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.header-title\s*{[\s\S]*clip:\s*rect\(0,\s*0,\s*0,\s*0\)/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.header-label\s*{[\s\S]*display:\s*inline-flex/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.header-actions\s*{[\s\S]*gap:\s*0\.4rem/i);
+    expect(styles).toMatch(/\.header-icon-button\s*{[\s\S]*width:\s*2\.75rem/i);
+
+    const header = document.querySelector('header');
+    const headerActions = header.querySelector('.header-actions');
+    const regenerateButton = document.getElementById('regenerate');
+    const clearButton = document.getElementById('clear');
+
+    expect(headerActions).not.toBeNull();
+    expect(headerActions.contains(regenerateButton)).toBe(true);
+    expect(headerActions.contains(clearButton)).toBe(true);
+    expect(regenerateButton.querySelector('.visually-hidden').textContent).toMatch(/new pattern/i);
+    expect(clearButton.querySelector('.visually-hidden').textContent).toMatch(/clear colors/i);
+  });
 });
