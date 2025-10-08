@@ -130,4 +130,17 @@ describe('Coloring Studio paint-by-numbers experience', () => {
     expect(paintCells.length).toBeGreaterThan(0);
     expect(paintCells.length).toBeLessThanOrEqual(50);
   });
+
+  test('mobile layout locks the viewport and keeps the studio content visible without scrolling', () => {
+    const styles = Array.from(document.querySelectorAll('style'))
+      .map((styleTag) => styleTag.textContent)
+      .join('\n');
+
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*body\s*{[\s\S]*overflow:\s*hidden/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*main\s*{[\s\S]*height:\s*100dvh/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*main\s*{[\s\S]*overflow:\s*hidden/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.studio\s*{[\s\S]*grid-template-rows:\s*minmax\(0,\s*1fr\)\s*auto/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.canvas-area\s*{[\s\S]*min-height:\s*0/i);
+    expect(styles).toMatch(/@media\s*\(max-width:\s*720px\)[\s\S]*\.canvas-wrapper\s*{[\s\S]*display:\s*flex/i);
+  });
 });
