@@ -31,15 +31,6 @@ Explore a magical castle in this enchanting adventure game. Discover rooms, coll
 - 🎨 Beautiful Graphics
 - 🎯 Educational Spelling Challenges
 
-### 🌲 Forest Friends Picnic
-Join woodland pals for a cozy picnic! Listen to each friend’s clue and pick the snack that matches their favorite forest treat.
-
-**Features:**
-- 🦊 Adorable Animal Cast
-- 🧠 Listening & Deduction Practice
-- 🌟 Calming Visual Celebrations
-- 📱 Optimized for Touch and Desktop
-
 ### 🎨 Coloring Studio
 Bring a black-and-white fractal mosaic to life with your own palette! Tap a color, paint the matching number, and swipe to fill whole sections just like classic paint-by-numbers.
 
@@ -65,7 +56,6 @@ ellie/
 ├── animal-matching/        # Animal Matching game
 ├── princess-castle/        # Princess Castle Adventure game
 ├── princess-coffee-shop/   # Princess Coffee Shop game
-├── forest-picnic/          # Forest Friends Picnic game
 ├── coloring-studio/        # Paint-by-numbers coloring experience
 ├── README.md              # This file
 └── assets/                # Shared images and resources
